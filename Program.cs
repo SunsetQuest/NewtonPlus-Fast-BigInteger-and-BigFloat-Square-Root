@@ -20,7 +20,7 @@ internal static class Program
     {
 
         //////////////////////  Play Test Area  //////////////////////
-        TestBigIntegerSqrt(SunsetQuestSqrt, 30, randomMinBitSize:-1, randomMaxBitSize: 20000, print: true);
+        TestBigIntegerSqrt(NewtonPlusSqrt, 30, randomMinBitSize:-1, randomMaxBitSize: 20000, print: true);
         // NumberRangeTest(BigInteger)8e37, (BigInteger)8.5e37;);
         //TestBigFloatSqrt();
         //Benchmark(SunsetQuestSqrt, 20, 4);
@@ -83,7 +83,7 @@ internal static class Program
             Benchmark(JavaSqrt);
             //Benchmark(KahanSqrt);
             Benchmark(EdwardFalkSqrt);
-            Benchmark(SunsetQuestSqrt);
+            Benchmark(NewtonPlusSqrt);
         }
 
 

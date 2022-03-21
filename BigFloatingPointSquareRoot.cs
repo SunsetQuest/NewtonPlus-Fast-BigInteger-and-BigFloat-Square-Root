@@ -64,7 +64,7 @@ public static class BigFloatingPointSquareRoot
 
         int totalLen = shift + xLen;
         int needToShiftInputBy = (2 * wantedPrecision - xLen) - (totalLen & 1);
-        BigInteger val = SunsetQuestSqrt(x << needToShiftInputBy);
+        BigInteger val = NewtonPlusSqrt(x << needToShiftInputBy);
         int retShift = (totalLen + ((totalLen > 0) ? 1 : 0)) / 2 - wantedPrecision;
         return (val, retShift);
     }
