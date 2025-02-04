@@ -1,4 +1,6 @@
-﻿See CodeProject site for best formated and latest article:  https://www.codeproject.com/Articles/5321399/NewtonPlus-A-Fast-Big-Number-Square-Root-Function
+﻿Update: 2/3/2025 - A new version of Sqrt function with a good performance boost for larger numbers will be released in the day or so. The new version is called Newton Plus and is about 2X faster for numbers around 1e1000000. The old version is still available in the repo and is just as fast for smaller numbers.
+
+See CodeProject site for best formated and latest article:  https://www.codeproject.com/Articles/5321399/NewtonPlus-A-Fast-Big-Number-Square-Root-Function
 
 Thank you to the authors at https://www.convertsimple.com/convert-html-to-markdown/ for making a tool to convert this to markdown for here.
 
