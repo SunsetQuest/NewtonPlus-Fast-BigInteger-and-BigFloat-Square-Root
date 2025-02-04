@@ -1,5 +1,5 @@
 ﻿// Copyright Ryan Scott White. 3/2022
-// Relased under the MIT License. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Released under the MIT License. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
@@ -47,7 +47,7 @@ public static class BigFloatingPointSquareRoot
     /// </summary>
     /// <param name="x">The input value. This would be the in-precision part of the bits.</param>
     /// <param name="shift">(Optional)The shift that should be applied to the input value. (2 would be shift left by 2)</param>
-    /// <param name="wantedPrecision">(Optional)The number of inprecision bits to return.</param>
+    /// <param name="wantedPrecision">(Optional)The number of in-precision bits to return.</param>
     /// <returns>(in-precision bits as Big Integer, and the shift to scale it correctly)</returns>
     public static (BigInteger val, int shift) SunsetQuestSqrtFloatUsingIntVersion(BigInteger x, int shift = 0, int wantedPrecision = 0)
     {

@@ -1,5 +1,5 @@
-﻿// Copyright Ryan Scott White. 3/2022
-// Relased under the MIT License. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+﻿// Copyright Ryan Scott White. 2022, 2025
+// Released under the MIT License. Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
@@ -15,8 +15,8 @@ internal static class Benchmarking
     /// <summary>
     /// We will do several tests on each increment size. This is the percentage to keep.
     /// A value us 0.3 would keep the top 30% for each test.  We keep a top percentage because 
-    /// windows processes are interupted by context switches and we want the tests with the lowest 
-    /// number of interuptions for the most accurate score. 
+    /// windows processes are interrupted by context switches and we want the tests with the least 
+    /// number of interruptions for the most accurate true score. 
     /// </summary>
     private const double KEEP_TOP_PROPORTION = 0.2; //0.333334;
 
