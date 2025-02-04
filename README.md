@@ -61,7 +61,7 @@ C# Version
 
 Benchmarks have been done on this the algorithm throughout the development of it. The benchmarks were first to compare against others and later against itself.  Since there is such a wide range in performance, log scale charts are used for comparisons. Please note that small differences equate to large performance differences. Some Big-O examples have been added as color bands for X3, X2 \* Log(X), and X2. These bands all converge at 0,0 but the bottom of the chart has been removed for better visibility.
 
-![A chart showing the performance of the Newton Plus Function as compared to other functions.](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrt1Chart.png)
+![A chart showing the performance of the Newton Plus Function as compared to other functions.](other/images/NewtonPlusFastSqrt1Chart.png)
 
 For the functions tested, there seemed to be four classes of performance. The time examples are from my test workstation and will vary slightly with different hardware.
 
