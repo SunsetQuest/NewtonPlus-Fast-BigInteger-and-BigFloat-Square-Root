@@ -31,7 +31,7 @@ internal static class Benchmarking
     /// </summary>
     private const int SUBDIVISIONS_STEP_SIZE = 11;
 
-    public static void Benchmark(Func<BigInteger, BigInteger> Sqrt, int TrialCount = 1, int Seconds = 600, bool skipSmallNumbers = true, bool displayOutput = true, bool constantTestSize = true, int maxScale = int.MaxValue)
+    public static void Benchmark(Func<BigInteger, BigInteger> Sqrt, int trialCount = 5, int seconds = 120, bool skipSmallNumbers = false, bool displayOutput = true, bool constantTestSize = true, int maxScale = int.MaxValue)
     {
         string methodName = Sqrt.Method.Name;
 
@@ -47,14 +47,11 @@ internal static class Benchmarking
 
         Stopwatch perfTimer = new();
 
-        BigInteger junk = new();
-
         Stopwatch maxTime = Stopwatch.StartNew();
 
-        List<long> trailTimes = new();
+        List<long> trailTimes = [];
 
-
-        for (int scaleIndex = 3; scaleIndex < maxScale; scaleIndex++) //3
+        for (int scaleIndex = 3; scaleIndex < maxScale; scaleIndex++) 
         {
             trailTimes.Clear();
 
@@ -63,65 +60,69 @@ internal static class Benchmarking
             maxTime.Restart();
 
             // use for decreasing test count with number size
-            int thisTrialCt = constantTestSize ? TrialCount : (int)(TrialCount / Math.Pow(scaleIndex - 2, 2.5));
+            int thisTrialCt = constantTestSize ? trialCount : (int)(trialCount / Math.Pow(scaleIndex - 2, 2.5));
 
+            BigInteger x = 0;
             for (int trail = 0; trail < thisTrialCt; trail++)
             {
-                if (maxTime.ElapsedMilliseconds > (Seconds * 1000))
+                if (maxTime.ElapsedMilliseconds > (seconds * 1000))
                 {
                     goto skip;
                 }
 
+                //int itemNumber = (scaleIndex * SUBDIVISIONS_STEP_SIZE) + (subDivNumber - (SUBDIVISIONS_STEP_SIZE / 2));
+                //int bitCount = (int)Math.Round(Math.Pow(SUB_DIV_MAGNITUDE, itemNumber));
+                int bitCount = 1 << (scaleIndex);
+                int byteCt = 1 + (bitCount - 1) / 8;
+                int topBitPosInTopByte = ((bitCount - 1) % 8); // 0-7
+                byte[] bytes = new byte[byteCt];
+
+                r.NextBytes(bytes);
+                bytes[byteCt - 1] = (byte)(bytes[byteCt - 1] & ((1 << topBitPosInTopByte) - 1) | (1 << topBitPosInTopByte));
+                x = new(bytes, true, false);
+
+                BigInteger root = 0;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                perfTimer.Start();
+                perfTimer.Stop();
+                Thread.Sleep(0);
                 perfTimer.Restart();
-
-                for (int subDivNumber = -(SUBDIVISIONS_STEP_SIZE / 2); subDivNumber <= (SUBDIVISIONS_STEP_SIZE / 2); subDivNumber++)
+                perfTimer.Start();
+                for (int i = 0; i < 100; i++)
                 {
-                    int itemNumber = (scaleIndex * SUBDIVISIONS_STEP_SIZE) + subDivNumber;
-                    int bitCount = (int)Math.Round(Math.Pow(SUB_DIV_MAGNITUDE, itemNumber));
-                    int byteCt = 1 + (bitCount - 1) / 8;
-                    int topBitPosInTopByte = ((bitCount - 1) % 8); // 0-7
-                    byte[] bytes = new byte[byteCt];
-
-                    r.NextBytes(bytes);
-                    bytes[byteCt - 1] = (byte)(bytes[byteCt - 1] & ((1 << topBitPosInTopByte) - 1) | (1 << topBitPosInTopByte));
-                    BigInteger x = new(bytes, true, false);
-
-                    Thread.Sleep(0);
-                    perfTimer.Start();
-                    BigInteger root = Sqrt(x);
-                    perfTimer.Stop();
-
-                    //BigInteger tmp = root * root;
-                    //if (tmp > x)
-                    //    Console.WriteLine($"val^2 ({tmp}) < x({x})  off%:{((double)(tmp)) / (double)x}");
-                    //if ((tmp + 2 * root + 1) <= x)
-                    //    Console.WriteLine($"(val+1)^2({((root + 1) * (root + 1))}) >= x({x})");
-
-                    junk ^= root;
-
-                    if (skipSmallNumbers && perfTimer.ElapsedMilliseconds < (Seconds / 2))
-                    {
-                        goto skip2;
-                    }
+                    root = Sqrt(x);
                 }
+                perfTimer.Stop();
 
+                BigInteger tmp = root * root;
+                if (tmp > x)
+                    Console.WriteLine($"val^2 ({tmp}) < x({x})  off%:{((double)(tmp)) / (double)x}");
+                if ((tmp + 2 * root + 1) <= x)
+                    Console.WriteLine($"(val+1)^2({((root + 1) * (root + 1))}) >= x({x})");
+
+                if (skipSmallNumbers && perfTimer.ElapsedMilliseconds < (seconds / 2))
+                {
+                    goto skip2;
+                }
                 trailTimes.Add(perfTimer.ElapsedTicks);
             }
         skip:
             //remove the slowest values and also removes first time JIT times
             int keepCt = (int)Math.Ceiling(trailTimes.Count * KEEP_TOP_PROPORTION);
-            double avg = trailTimes.OrderBy(x => x).Take(keepCt).Average() / SUBDIVISIONS_STEP_SIZE;  // was
+            double averageTicksPer100 = trailTimes.OrderBy(x => x).Take(keepCt).Average();
+            double averageTicks = averageTicksPer100 / 100;
             // Console.WriteLine(i1.GetBitLength() + " \t" + (double)i1 + "\tR:" + sw0 + " M:" + sw1 + "  (" + totalTicks0.ToString() + " vs " + totalTicks1.ToString() + ")   Diff: " + (b21 - a01).ToString() + "," + (b22 - a02).ToString() + " j" + junk.ToString()[0]);
-            int bitCount2 = (int)Math.Round(Math.Pow(Math.Pow(2, 1.0 / SUBDIVISIONS_STEP_SIZE), scaleIndex * SUBDIVISIONS_STEP_SIZE));
+            double averageNanoseconds = (averageTicks / Stopwatch.Frequency) * 1000000000;
 
             if (displayOutput)
             {
-                Console.WriteLine(methodName + "\t" + keepCt + "\t" + trailTimes.Count + "\t" + bitCount2 + "\t " + Math.Round(avg, 2));
+                Console.WriteLine($"{methodName}\t{keepCt}\t{trailTimes.Count}\t{x.GetBitLength()}\t{Math.Round(averageNanoseconds, 2)}");
             }
 
-            if (TrialCount < 4)
+            if (trialCount < 4)
             {
-                if (TrialCount == trailTimes.Count && (maxTime.ElapsedMilliseconds > (Seconds * 1000)))
+                if (trialCount == trailTimes.Count && (maxTime.ElapsedMilliseconds > (seconds * 1000)))
                 {
                     break;
                 }
@@ -150,7 +151,6 @@ internal static class Benchmarking
         Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.RealTime;
         Thread.CurrentThread.Priority = ThreadPriority.Highest;
         //Process.GetCurrentProcess().PriorityBoostEnabled = true;
-
 
         Stopwatch perfTimer = new();
 

@@ -3,6 +3,8 @@
 
 #pragma warning disable IDE0051, IDE0050, CA1050 // Ignore unused code and missing namespace
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 
@@ -29,7 +31,7 @@ public static class BigIntegerSquareRootOthers
         {
             root = (BigInteger)Math.Sqrt((double)value);
         }
-        else // large: reduce with bitshifting, then convert to double (and back)
+        else // large: reduce with bit-shifting, then convert to double (and back)
         {
             root = (BigInteger)Math.Sqrt((double)(value >> (byteLen - 127) * 8)) << (byteLen - 127) * 4;
         }
@@ -57,7 +59,7 @@ public static class BigIntegerSquareRootOthers
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     //Converted from Java to C# by Ryan Scott White
-    // added code to handle negitive numbers.
+    // added code to handle negative numbers.
 
     //https://code.yawk.at/java/13/java.base/java/math/MutableBigInteger.java#java.math.MutableBigInteger%23sqrt()  6/9/2021
     /* Calculate the integer square root {@code floor(sqrt(this))} where
@@ -235,7 +237,7 @@ public static class BigIntegerSquareRootOthers
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Nordic Mainframe 2010   https://stackoverflow.com/a/3432579  [Optimized by Ryan Scott White in Nov-Dec 2021]
-    // Note: Updated by Ryan White to work with BigInteger and also add negitive number guard clause.
+    // Note: Updated by Ryan White to work with BigInteger and also add negative number guard clause.
     // Updated to be initialized with HW sqrt. 
     public static BigInteger NordicMainframeOptimizedSqrt1(BigInteger x) //NordicMainframeOptimizedSqrt
     {
@@ -282,7 +284,7 @@ public static class BigIntegerSquareRootOthers
         }
         else
         {
-            // ~1 to make sure sure we shift by an even count - this makes sure we know the output size. (if it were odd it would be much more complicated to calc.)
+            // ~1 to make sure we shift by an even count - this makes sure we know the output size. (if it were odd it would be much more complicated to calc.)
             int shiftAmt = ((int)x.GetBitLength() - 105) & ~1;   // USE FOR VERSIONS .NET 5   & UP
             //int shiftAmt = (GetBitLength(x) - 105) & ~1;       // USE FOR VERSIONS .NET 4.8 & UNDER
 
@@ -428,7 +430,7 @@ public static class BigIntegerSquareRootOthers
         // Modified by Ryan Scott White on 1/22/22 to see if we can improve it. 
         // I noticed Nordic's function was the only other BigO(n^2 log(n) but was starting out behind.  I wanted to see
         // if I gave it a good start using the hardware Sqrt and even doing a couple newton Rounds would help but it did not.
-        // It is still BigO(n^2 log(n) but it is still n^2 slower. I also tried to increase the precision as it igores but
+        // It is still BigO(n^2 log(n) but it is still n^2 slower. I also tried to increase the precision as it ignores but
         // that did not help much.
         int b = outLen - size - 1;
         BigInteger r = val; // r will contain the result
@@ -545,10 +547,10 @@ public static class BigIntegerSquareRootOthers
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Edward Falk 2013  https://stackoverflow.com/a/16804098/2352507
-    // Converted from java to C# by Ryan Scott White
+    // Converted from Java to C# by Ryan Scott White
     // - Edward's code was designed to work well in Java (not C#)
     // - performance might be impacted because of this
-    // - added code to handle negitive numbers
+    // - added code to handle negative numbers
     public static BigInteger EdwardFalkSqrt(BigInteger x) //EdwardFalkSqrt
     {
         if (x <= 0)
@@ -584,10 +586,10 @@ public static class BigIntegerSquareRootOthers
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Jim 2012 https://stackoverflow.com/a/11962756/2352507
-    // Converted from java to C# by Ryan Scott White
+    // Converted from Java to C# by Ryan Scott White
     // - Jim's code was designed to work well in Java (not C#)
     // - performance might be impacted because of this
-    public static BigInteger JimSqrt(BigInteger x) // JimSqrt
+    public static BigInteger JimSqrt(BigInteger x)
     {
         if (x.CompareTo(0) < 0)
         {
@@ -602,17 +604,15 @@ public static class BigIntegerSquareRootOthers
         BigInteger y;
         // starting with y = x / 2 avoids magnitude issues with x squared
         for (y = x / 2;
-        y.CompareTo(x / (y)) > 0;
-        y = (x / y + y) / 2)
-        {
-            ;
-        }
+            y.CompareTo(x / (y)) > 0;
+            y = (x / y + y) / 2)
+        { }
 
         return y;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Jeremy Kahan  Sep 22 '16 at 5:37 https://stackoverflow.com/a/39631028
+    // Jeremy Kahan - Sept. 22 '16 at 5:37 https://stackoverflow.com/a/39631028
     public static BigInteger KahanSqrt(BigInteger n) //KahanSqrt
     {
         BigInteger oddNumber = 1;
@@ -644,10 +644,7 @@ public static class BigIntegerSquareRootOthers
             {
                 throw new ArgumentException("Negative argument.");
             }
-            else
-            {
-                return 0;
-            }
+            return 0;
         }
 
         do
