@@ -7,17 +7,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewtonPlusSquareRoot", "New
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Benchmark1core|Any CPU = Benchmark1core|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-		Release2b|Any CPU = Release2b|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A4563C1-D145-4B2B-80A6-903536BEBC99}.Benchmark1core|Any CPU.ActiveCfg = Benchmark1core|Any CPU
+		{3A4563C1-D145-4B2B-80A6-903536BEBC99}.Benchmark1core|Any CPU.Build.0 = Benchmark1core|Any CPU
 		{3A4563C1-D145-4B2B-80A6-903536BEBC99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3A4563C1-D145-4B2B-80A6-903536BEBC99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A4563C1-D145-4B2B-80A6-903536BEBC99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A4563C1-D145-4B2B-80A6-903536BEBC99}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A4563C1-D145-4B2B-80A6-903536BEBC99}.Release2b|Any CPU.ActiveCfg = Release2b|Any CPU
-		{3A4563C1-D145-4B2B-80A6-903536BEBC99}.Release2b|Any CPU.Build.0 = Release2b|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
