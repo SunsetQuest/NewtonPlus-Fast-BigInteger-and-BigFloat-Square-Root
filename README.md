@@ -6,46 +6,49 @@ This article was originally posted on [CodeProject](https://www.codeproject.com/
 
 Contents
 --------
+
 - [Introduction](#introduction)
-- [C# Version](#c--version)
+- [C-Sharp Version](#c-sharp-version)
   * [Performance Benchmarks](#performance-benchmarks)
-  * [The Code (C# version)](#the-code--c--version-)
-  * [Floating Point Version / Adapter](#floating-point-version---adapter)
-  * [Round-to-Nearest Integer Version / Adapter](#round-to-nearest-integer-version---adapter)
+  * [The Code - C-Sharp version](#the-code---c-sharp-version)
+  * [Floating Point Adapter](#floating-point-adapter)
+  * [Round-to-Nearest Integer Adapter](#round-to-nearest-integer-adapter)
   * [Testing](#testing)
 - [Java version](#java-version)
   * [Performance Chart](#performance-chart)
-  * [The Code (Java version)](#the-code--java-version-)
-- [World’s Fastest Square Root for Big Numbers?](#world-s-fastest-square-root-for-big-numbers-)
+  * [The Code -Java version](#the-code--java-version)
+- [The Fastest Square Root for Big Numbers in C-Sharp and Java](#the-fastest-square-root-for-big-numbers-in-c-sharp-and-java)
 - [Optimizations](#optimizations)
-  * [Optimization: Shrinking the division (Newton Plus)](#optimization--shrinking-the-division--newton-plus-)
+  * [Optimization - Shrinking the division - also called Newton Plus](#optimization---shrinking-the-division---also-called-newton-plus)
     + [The Code for Newton Plus](#the-code-for-newton-plus)
     + [An Example of Newton Plus](#an-example-of-newton-plus)
     + [Further Enhancing Newton Plus](#further-enhancing-newton-plus)
-  * [Optimization: Use a starting size, that when doubled repeatedly, ends up at the correct precision.](#optimization--use-a-starting-size--that-when-doubled-repeatedly--ends-up-at-the-correct-precision)
+  * [Optimization - Use a starting size - that when doubled repeatedly - ends up at the correct precision](#optimization---use-a-starting-size---that-when-doubled-repeatedly---ends-up-at-the-correct-precision)
     + [Generate an efficient starting size](#generate-an-efficient-starting-size)
-  * [Optimization: Using the hardware square root for small numbers directly](#optimization--using-the-hardware-square-root-for-small-numbers-directly)
-  * [Optimization: Using the hardware’s double square root to initialize the first 53 bits of larger numbers](#optimization--using-the-hardware-s-double-square-root-to-initialize-the-first-53-bits-of-larger-numbers)
-  * [Optimization: Using precision reached or pre-calculated number of Newton iterations](#optimization--using-precision-reached-or-pre-calculated-number-of-newton-iterations)
-  * [Optimization: Binary search tree for selecting best optimization by scale](#optimization--binary-search-tree-for-selecting-best-optimization-by-scale)
-  * [Optimization: Cast to long before sqrt hardware fast results up to 6.7e7.](#optimization--cast-to-long-before-sqrt-hardware-fast-results-up-to-67e7)
-  * [Optimization:  Grow the datatype (BigInteger) with the precision.](#optimization---grow-the-datatype--biginteger--with-the-precision)
-  * [Optimization: A fast flooring method](#optimization--a-fast-flooring-method)
-  * [Optimization: Extend hardware Sqrt to 1.45e17 by flooring result](#optimization--extend-hardware-sqrt-to-145e17-by-flooring-result)
-  * [Optimization: Use a “+1” on the hardware sqrt for up to 4e31 (Depreciated)](#optimization--use-a---1--on-the-hardware-sqrt-for-up-to-4e31--depreciated-)
-  * [Optimization: Checking if over or under by 1. (Depreciated)](#optimization--checking-if-over-or-under-by-1--depreciated-)
-  * [Optimization: Handling final rounding issues with extra bits from final iteration. (Depreciated)](#optimization--handling-final-rounding-issues-with-extra-bits-from-final-iteration--depreciated-)
-- [Further Possible Optimization Ideas - for the rest of the world](#further-optimization-ideas---for-the-rest-of-the-world)
-  * [Possible Optimization: A faster “val * val”](#possible-idea--a-faster--val---val-)
-  * [Possible Optimization: Concatenating val and X / val Instead of Shifting and Adding](#possible-optimization--concatenating-val-and-x---val-instead-of-shifting-and-adding)
-    + [Challenges in C# and Carry Propagation](#challenges-in-c--and-carry-propagation)
-    + [1. BigInteger Limitations in C#](#1-biginteger-limitations-in-c-)
+  * [Optimization - Using the hardware square root for small numbers directly](#optimization---using-the-hardware-square-root-for-small-numbers-directly)
+  * [Optimization - Using the hardwares double square root to initialize the first 53 bits of larger numbers](#optimization---using-the-hardwares-double-square-root-to-initialize-the-first-53-bits-of-larger-numbers)
+  * [Optimization - Using precision reached or pre-calculated number of Newton iterations](#optimization---using-precision-reached-or-pre-calculated-number-of-newton-iterations)
+  * [Optimization - Binary search tree for selecting best optimization by scale](#optimization---binary-search-tree-for-selecting-best-optimization-by-scale)
+  * [Optimization - Cast to long before sqrt hardware fast results up to 6.7e7.](#optimization---cast-to-long-before-sqrt-hardware-fast-results-up-to-67e7)
+  * [Optimization - Grow the BigInteger datatype with the precision](#optimization---grow-the-biginteger-datatype-with-the-precision)
+  * [Optimization - A fast flooring method](#optimization---a-fast-flooring-method)
+  * [Optimization - Extend hardware Sqrt to 1.45e17 by flooring result](#optimization---extend-hardware-sqrt-to-145e17-by-flooring-result)
+  * [Optimization - Use a - plus 1 - on the hardware sqrt for up to 4e31 - Depreciated](#optimization---use-a---plus-1---on-the-hardware-sqrt-for-up-to-4e31---depreciated)
+  * [Optimization - Checking if over or under by 1 - Depreciated](#optimization---checking-if-over-or-under-by-1---depreciated)
+  * [Optimization - Handling final rounding issues with extra bits from final iteration - Depreciated](#optimization---handling-final-rounding-issues-with-extra-bits-from-final-iteration---depreciated)
+- [Further Possible Optimization Ideas - for the rest of the world](#further-possible-optimization-ideas---for-the-rest-of-the-world)
+  * [Possible Optimization - A faster val x val](#possible-optimization---a-faster-val-x-val)
+  * [Possible Optimization - Concatenating Instead of Shifting and Adding](#possible-optimization---concatenating-instead-of-shifting-and-adding)
+    + [Challenges in C-Sharp and Carry Propagation](#challenges-in-c-sharp-and-carry-propagation)
+    + [1. BigInteger Limitations in C-Sharp](#1-biginteger-limitations-in-c-sharp)
     + [2. Carry Issue at the Overlapping Boundary](#2-carry-issue-at-the-overlapping-boundary)
-    + [Alternative Approach: Pre-allocated val Buffer](#alternative-approach--pre-allocated-val-buffer)
-  * [Possible Optimization: Using extra lucky bits](#possible-optimization--using-extra-lucky-bits)
-  * [Possible Optimization: Use Mutable Big Integers (Platform Performance improvement)](#possible-optimization--use-mutable-big-integers--platform-performance-improvement-)
-  * [Possible idea: Use a native wrapper in c (Platform Performance improvement)](#possible-idea--use-a-native-wrapper-in-c--platform-performance-improvement-)
-- [How did this function come about?](#how-did-this-function-come-about-)
+    + [Alternative Approach - Pre-allocated val Buffer](#alternative-approach---pre-allocated-val-buffer)
+  * [Possible Optimization - Using extra lucky bits](#possible-optimization---using-extra-lucky-bits)
+  * [Possible Optimization - Use Mutable Big Integers - Platform Performance improvement](#possible-optimization---use-mutable-big-integers---platform-performance-improvement)
+  * [Possible Optimization - Use a native wrapper in c - Platform Performance improvement](#possible-optimization---use-a-native-wrapper-in-c---platform-performance-improvement)
+- [How this function come about](#how-this-function-come-about)
+- [Thank you to the following](#thank-you-to-the-following)
+
 
 Introduction
 ------------
@@ -59,7 +62,7 @@ The algorithm consists of a core integer square root function and a wrapper for 
 
 The integer square root function has been extensively tested with a variety of test types and benchmarks.
 
-C# Version
+C-Sharp Version
 ----------
 
 ### Performance Benchmarks
@@ -75,10 +78,10 @@ For the functions tested, there seemed to be four classes of performance. The ti
 * **Big O(n2 * log(n)) **– These are the much faster and more thought-out algorithms. A 40,000-digit binary takes around just 230ms.
 * **Big O(n2) **– This project is consistent with this band or maybe even slightly faster. A 40,000-digit binary number takes around 8ms.
 
-### The Code (C# version)
+### The Code - C-Sharp version
 
 Just show me the code will you.
-
+```c#
     public static BigInteger NewtonPlusSqrt(BigInteger x)
     {
         if (x < 144838757784765629)          // 1.448e17 = ~1<<57
@@ -181,11 +184,11 @@ Just show me the code will you.
     
         return val;
     }
-
-### Floating Point Version / Adapter
+```
+### Floating Point Adapter
 
 With this project, I also wanted to make a BigFloat version for large floating points. To do this, a few BigFloat versions were constructed from scratch. Despite this, all that was needed was a simple wrapper function for the BigInteger version. BigFloat and BigInteger versions are roughly the same. An encapsulating function, shown below, simply adds some spice to the BigInteger version for keeping track of the precision and shifts.
-
+```c#
     (BigInteger val, int shift) SunsetQuestSqrtFloatUsingIntVersion(BigInteger x, int shift = 0, int wantedPrecision = 0)
     {
         int xLen = (int)x.GetBitLength();
@@ -197,19 +200,19 @@ With this project, I also wanted to make a BigFloat version for large floating p
         var retShift = (totalLen + ((totalLen > 0) ? 1 : 0)) / 2 - wantedPrecision;
         return (val, retShift);
     }
-
+```
 The pre/post calculations are relatively simple.  In a nutshell, the precision we get out of the Sqrt function is half what we put in.  So, if we want 20-bits of precision then we just scale the size of the input X to be 40 bits. 
 
 The shifts are mostly straightforward calculations.  The “(totalLen & 1)” is required to make sure we shift by an even amount.  For example, the binary Sqrt of 10000 is 100. This result is simply a right-shift by an even number. If we had Sqrt of 100000(aka 32) then the Sqrt is 101(aka 5) and this is not a simple right shift anymore. We just need to keep the input length an odd number in length. 
 
 The `(totalLen > 0) ? 1 : 0)` part is because we always want to round to negative infinity for the return shift.
 
-### Round-to-Nearest Integer Version / Adapter
+### Round-to-Nearest Integer Adapter
 
 The `Sqrt` functions here all round down to the nearest integer. This is the standard for integer functions. If the result of a sqrt function is 99.999999998 then it should be rounded down to 99.  However, in some cases a rounding-to-nearest-integer is preferred. To do this, all that is needed is to calculate one extra bit of precision with the standard integer sqrt function. If that extra ends up being a zero, then it would be rounded down or else if a “1” bit then rounded up.   
   
 So, something like:
-
+```c#
     BigInteger SqrtNearestInt(BigInteger x)
     {
         x <<= 2; // left shift by 2
@@ -218,13 +221,13 @@ So, something like:
              result ++;
         return (res >> 1); //right shift by 1
     }
-
+```
 note: this is untested
 
 ### Testing
 
 For this algorithm, extensive testing has been done and I believe all then errors have been removed. However, to guarantee this, the following can be added near the end. It will have around a 10% performance cost.
-
+```c#
     BigInteger sqrd = val * val;
     if (sqrd > x)
     {
@@ -236,7 +239,7 @@ For this algorithm, extensive testing has been done and I believe all then error
         Console.WriteLine($"(val+1)^2({(sqrd + 2 * val + 1)}) <= x({x})");
         throw new Exception("Sqrt function had internal error - value too low");
     }
-
+```
 A considerable amount of time was spent in testing the integer sqrt. It ran for several days on a 32 thread 1950x threadripper with no errors.   
 Tests include: 
 
@@ -275,7 +278,7 @@ A logarithmic view provides the best look.  I think this is best at showing the
 
 ![](other/images/NewtonPlusFastSqrtInJava4Chart.jpg)
 
-### The Code (Java version)
+### The Code -Java version
 
 public static BigInteger NewtonPlusSqrt(BigInteger x) {
     if (x.compareTo(BigInteger.valueOf(144838757784765629L)) < 0) {
@@ -284,7 +287,7 @@ public static BigInteger NewtonPlusSqrt(BigInteger x) {
         if (vInt * vInt > xAsLong)
             vInt--;
         return BigInteger.valueOf(vInt);  }
-
+```java
     double xAsDub = x.doubleValue();
     BigInteger val;
     if (xAsDub < 2.1267e37) // 2.12e37 largest here since sqrt(long.max*long.max) > long.max
@@ -367,16 +370,16 @@ public static BigInteger NewtonPlusSqrt(BigInteger x) {
 
     return val;
 }
-
-World’s Fastest Square Root for Big Numbers?
---------------------------------------------
+```
+The Fastest Square Root for Big Numbers in C-Sharp and Java
+--------------------------------------------------------------
 
 The World's fastest for Java and C#... I think so. But this project is not the world's fast square root.
 
 The fastest that I have found is the GMP Square Root. It is considerably faster. One of the reasons is GMP/MPIR is faster is it is written in assembly and c – both low level languages.  When writing in asm/c the hardware architecture can be used to its fullest including SSE/MXX 128-bit instructions/registers, optimizing cache, and other close-to-metal tricks/instructions.
 
 Here are some very rough comparisons: (in ns)
-
+```
 |     | GMP | This Project | Speed-Up |
 | --- | --- | --- | --- |
 | 1E+77 | 350 | 1058 | 3.0X |
@@ -389,36 +392,36 @@ Here are some very rough comparisons: (in ns)
 | 1E+9864 | 17650 | 458488 | 26X |
 | 1E+19728 | 51850 | 1815669 | 35X |
 | 1E+39457 | 144950 | 6762354 | 47X |
-
+```
 Optimizations
 -------------
 
 All this speedup is done with different optimizations, tricks, techniques, technologies, creative ideas or whatever we want to call them. Each one of these ideas adds to the overall performance. The ideas here come from myself and others.
 
 First off, let’s review the basics. There are a few long-time known methods of finding a square root and the most popular is Newton’s method (also known as the Babylonian method or Heron’s method). It can be summarized into:
-
-    Let x = the number we want to find the sqrt of
-    Let v = a rough estimate of Sqrt(x)
+```c#
+    // Let x = the number we want to find the sqrt of
+    // Let v = a rough estimate of Sqrt(x)
     while(desired_precision_not_met) 
         v = (v + x / v) / 2
     return v
-
+```
 When calculating a square root using Newton’s method (and other methods), we start by finding the most significate digits. This first step can be done by choosing a number that is half the number of bits as the inputs. So, the number 2101 (a 1 with 101 zeros in binary) will have a good starting point of around 251. This roughly gets us started with one bit of accuracy at the correct scale.
 
 Then it’s time for the Newton iterations. For each iteration of `v = (v + x / v) / 2` the number of digits in precision, doubles. An initial 1-bit guess doubled to 2 bits of accuracy, then 4, then 8, etc.  (Note: shifts left out for simplicity)
-
-_Initial Guess:                                        100000000000000000000000000000000000000000000000000…  
+```
+Initial Guess:                                100000000000000000000000000000000000000000000000000…  
 Iteration 1 of v = (v + x / v) / 2:           110000000000000000000000000000000000000000000000000…  
 Iteration 2 of v = (v + x / v) / 2:           101101010101010101010101010101010101010101010101010…  
 Iteration 3 of v = (v + x / v) / 2:           101101010000010100000101000001010000010100000101000…  
 Iteration 4 of v = (v + x / v) / 2:           101101010000010011110011001100111111101010111110110…  
-Iteration 5 of v = (v + x / v) / 2:           101101010000010011110011001100111111100111011110011…_
-
+Iteration 5 of v = (v + x / v) / 2:           101101010000010011110011001100111111100111011110011…
+```
 It helps to view this in binary – as shown from the growing underlined correct bits above. In decimal (base10) this would be completely hidden. There are some insights in doing math in binary.
 
 Okay, now that the basics are out of the way, let’s explore at the different optimizations. I will start out with some important new ones I found along with the more important ones so check out the first few at least.
 
-### Optimization: Shrinking the division (Newton Plus)
+### Optimization - Shrinking the division - also called Newton Plus
 
 Okay, let me start out with my #1 optimization.
 
@@ -428,12 +431,11 @@ When doing typical Newton iterations by hand in binary something jumps out. The 
 
 A way to look at what “v +” is doing in the classical Newton I that it is just shifting the left side of “x/v” by one.  In this example the “V +” is just injecting the red zero.
 
-Copy Code
-
-_  v +    = **101101010000010**0000000000000000  
-  x / v  = **101101010000010**1111001100110011  
-  Sum:     **1011010100000101111001100110011**_
-
+```
+   v +    = **101101010000010**0000000000000000  
+  x / v   = **101101010000010**1111001100110011  
+   Sum:     **1011010100000101111001100110011**
+```
 _note: Notice the “V +” is just upshifting the top half by 1._
 
 So, we already have half the bits here, so why keep then in the divide!  When looking at the classical Newton above the X / V =  1011010100000101111001100110011. If we look at the x/v part, it can be thought of as two parts.  There is the top half that is in bold that we already know because it already exists in the current v.  And the bottom half has the current the part we are short on. We only need to work with the bottom bits.
@@ -457,7 +459,7 @@ _  "V" concatenated with "(X-V^2)/V"
 #### The Code for Newton Plus
 
 Below would be one iteration of Newton Plus. This should be repeated until the desired precision is met.
-
+```c#
     void NewtonPlus(BigInteger x, int xLenMod, ref int size, ref BigInteger val)
     {
         int shiftX = xLenMod - (3 * size);
@@ -466,7 +468,7 @@ Below would be one iteration of Newton Plus. This should be repeated until the d
         val = (val << size) + (valSU / val);
         size *= 2;
     }
-
+```
 The parameters:
 
 * "X" is The input. The value we are trying to find the Sqrt of.
@@ -475,30 +477,30 @@ The parameters:
 * "val" is the current result. With each call to this function, it doubles in size (and precision).
 
 Just for comparison, here is a typical Newton.
-
+```c#
     void NewtonClassic(BigInteger x, int xLenMod, ref int size, ref BigInteger val)
     {
         BigInteger tempX = x >> xLenMod - (3 * size) + 1;
         val = (val << (size - 1)) + tempX / val;
         size <<= 1;
     }
-
+```
   
 
 In the simplest form, it looks like…
-
-**Vn+1 = (Vupshifted) \+ (Xdownshifted \- V2upshifted) / V**
-
+```
+Vn+1 = (Vupshifted) \+ (Xdownshifted \- V2upshifted) / V
+```
 With more detail…
-
-**XLenMod = IntLog2(X) + (IntLog2(X) mod 2) Vn+1  
-=(V << (IntLog2(V)+1)) + (\[X >> ((XLenMod - 3 * IntLog2(V)) - (V2 << IntLog2(V))\] / V)**
-
+```
+XLenMod = IntLog2(X) + (IntLog2(X) mod 2) Vn+1  
+= (V << (IntLog2(V)+1)) + (\[X >> ((XLenMod - 3 * IntLog2(V)) - (V2 << IntLog2(V))\] / V)
+```
 Or with concatenation…
-
+```
 **Vn+1=V Concat with (\[X >> ((XLenMod - 3 * IntLog2(V)) - (V2 << IntLog2(V))\] / V)**
-
-Notes:
+```
+#####Notes
 
 * For the concatenate method to work we must have the V part exact. If the “Xdownshifted \- V2upshifted” results in a negative number, then it is not exact.
 * Since at this point the “V +” or more precisely “(V << (IntLog2(V) + 1)) +” is just left shifting V in front and then adding we can just do a concatenation.  Shifting V and then adding the two is a lot more work when they could just simply be concatenated.
@@ -518,7 +520,7 @@ Then on **Line 10,** we pre-subtract out the V2 from x.  This is the magical s
 On **Line 12**, we do the typical divide but with a smaller numerator then the standard Newton.
 
 On **Line 13**, we upshift V and then add it to T on **Line 14**.  One could argue though that we “Add V” with the standard Newton so how is this any different?  It is different because we are restoring V back in verses with the standard Newton the “Add V” is just upshifting the top half of the bits by 1.
-
+```
 |     |     |     |     |     |     |
 | --- | --- | --- | --- | --- | --- |
 | Line |     |     | Decimal | Binary | Len |
@@ -553,8 +555,7 @@ On **Line 13**, we upshift V and then add it to T on **Line 14**.  One could ar
 | 30  |     | V=T+(V<<) | 2912711099 | 10101101100111000111000110111011 | \[32\] |
 | _31_ | _True answer_ |     | _2912711096_ | _10101101100111000111000110111000_ | _\[32\]_ |
 | _32_ | _Off by_ |     | _3_ | _11_ | _\[2\]_ |
-
-  
+```
 
 Here it is in more of a math-like format…
 
@@ -579,7 +580,7 @@ In the above we are calculating the full answer of v2 but we really only need to
 Calculating the bottom half of v2 and then subtracting a subset of bits in x will give us the new bits. These new additional bits can then be appended to the current v we have been building.
 
 I attempted this in C# but .NET’s BigInteger does not really allow us to calculate only the bottom half of v*v.  I did try the `ModPow()` but it did not seem like the performance was that great because `ModPow()` is doing division where I really just want to stop calculating v*v halfway throw.  Also, my implementation had some errors and was not always correct.  A custom BigInteger class would probably need to be built.
-
+```c#
     void NewtonPlus(BigInteger x, int xLenMod, ref int size, ref BigInteger val)
     {
         BigInteger tmp2 = (BigInteger.ModPow(val, 2, BigInteger.One << (size + 1)) << (size));
@@ -589,39 +590,37 @@ I attempted this in C# but .NET’s BigInteger does not really allow us to calcu
         val = (val << (size + 1)) + (valSU2 / val);
         size = (size << 1) + 1;
     }
-
+```
   
 
 **Impact:** Medium
 
 **Used by:** none – personal idea (The name “Newton Plus” is just a name I assigned.)
 
-### Optimization: Use a starting size, that when doubled repeatedly, ends up at the correct precision.
+### Optimization - Use a starting size - that when doubled repeatedly - ends up at the correct precision
 
 We figure out an initial size so if we keep doubling it, it will end up with the precision we want.
 
 Say the result is expected to be 600-bits in size and we get an initial free guess with 64 bits of known accuracy. If we used newton to keep doubling, we get 128, 256, 512, and then we do a partial at 579.
+```
 
-|     |     |     |     |     |     |     |     |     |     |     |     |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|     | 64-bit Memory Segments for BigInteger Storage |     |     |     |     |     |     |     |     |     | Time |
-| Initial Value | 64  |     |     |     |     |     |     |     |     |     | 0   |
-| Newton Loop 1 | 64  | 128 |     |     |     |     |     |     |     |     | 2*2=4 |
+| 64-bit Memory Segments for BigInteger Storage                             | Time   |
+| Initial Value | 64  |     |     |     |     |     |     |     |     |     | 0      |
+| Newton Loop 1 | 64  | 128 |     |     |     |     |     |     |     |     | 2*2=4  |
 | Newton Loop 2 | 64  | 128 | 192 | 256 |     |     |     |     |     |     | 4*4=16 |
 | Newton Loop 3 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 |     |     | 8*8=64 |
 | Newton Loop 4 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 | 576 | 640 | 9*9=81 |
-
+```
 Now we can improve on this by starting on a size that if we keep doubling it will result in the target size, or slightly larger.
+```
 
-|     |     |     |     |     |     |     |     |     |     |     |     |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|     | 64-bit Memory Segments for BigInteger Storage |     |     |     |     |     |     |     |     |     | Time |
-| Initial Value | 37  |     |     |     |     |     |     |     |     |     | 0   |
-| Newton Loop 1 | 64  | 74  |     |     |     |     |     |     |     |     | 2*2=4 |
-| Newton Loop 2 | 64  | 128 | 148 |     |     |     |     |     |     |     | 3*3=9 |
+| 64-bit Memory Segments for BigInteger Storage                             |  Time  |
+| Initial Value | 37  |     |     |     |     |     |     |     |     |     | 0      |
+| Newton Loop 1 | 64  | 74  |     |     |     |     |     |     |     |     | 2*2=4  |
+| Newton Loop 2 | 64  | 128 | 148 |     |     |     |     |     |     |     | 3*3=9  |
 | Newton Loop 3 | 64  | 128 | 192 | 256 | 296 |     |     |     |     |     | 5*5=25 |
 | Newton Loop 4 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 | 576 | 592 | 9*9=81 |
-
+```
 Each empty block versus the previous table is a saved calculation.
 
 There is still a way to improve of this even more.  If we look at the example table above, we ended up at 592. That is 13 bits more then we needed. And in the step before that we have 7 bits more then we need. This is because our starting size of 64 bits was small, so it did not give us very much resolution. What we can do instead is start with a max initial value of 128. We can get this simply by using our 64 initial and doing one newton iteration. This Newton iteration would be very fast since it is so small. But now if we do this again using the larger number, we will get 73. (579 -> 290 -> 146 -> 73) When we keep doubling this with 73 back up, we get 73 -> 146 -> 292 -> 584.  Notice we now only calculated 584 bits and not 592 like before. This is closer to our target of 579.  In this example it would not have sped anything up but if there was a “Loop 5/6” row some blocks would disappear.
@@ -633,44 +632,40 @@ One other approach is to re-adjust several times.  Maybe right size on every nt
 #### Generate an efficient starting size
 
 To generate a starting size, we can start with the full size, then keep halving it until it until it is small enough to fit in an initial guess.   579 -> 290 -> 146 -> 74 -> 37.  So, 37 would be our starting point.  Something like:
-
+```c#
     int startingSize = expectedOutputSize; 
     while (startingSize > 64) 
     {   startingSize >>= 1; 
         doublingCt++; 
     }
-
-  
+```
 
 Here` startingSize` would contain the initial size we need.  64 bits is the accuracy of our initial guess in this example. And `doublingCt` would be how many Newton iterations we need to do.
 
 Another way to do this that works well for large numbers:
-
+```c#
     int doublingCt = BitOperations.Log2((uint)((wantedPrecision – 1) / 64)) + 1;
     int startingSize = ((wantedPrecision – 1) >> doublingCt) + 1;
-
+```
   
-
 **Impact:** Major (no impact on numbers below 4e127, large impact on larger numbers)
 
 **Used by:** None – personal idea
 
-### Optimization: Using the hardware square root for small numbers directly
+### Optimization - Using the hardware square root for small numbers directly
 
 We can use the built-in hardware square root function that exists on most processors today. A double floating point square root function will take in up to 53 significate binary digits and give us 26 bits of precision on the output.
 
 Using the built-in floating-point, exposed with`Math.Sqrt(someDouble)` in C#, will yield the exact answer up to 13 bits in precision and for results up to 28-bits it may round up.  So, functions can try and use the hardware Sqrt directly when the input is small. This does not work well if the input is over 53-bits in size.  This trick has been used by many different square root implementations like Java’s BigInteger Square root function. 
+```
 
-|     |     |     |
-| --- | --- | --- |
-| Double-Precision Hardware Square Root Precision |     |     |
-| Input Range (Bit size) | 0-26 | 26-57 |
-| Input Range (number) | 0 – 67108863 | 67108864 - 2^57 |
-| Output Accuracy in Bits | 13 bits | 28.5 bits |
-| Output Accuracy as Number | 0 – 8,191 | 8192 - 379625062 |
-| Accuracy | Exact! (Always rounded down) | Either Rounded Up or Down |
-
-  
+  Double-Precision Hardware Square Root Precision 
+| Input Range (Bit size)                  | 0-26         | 26-57            |
+| Input Range (number)                    | 0 – 67108863 | 67108864 - 2^57  |
+| Output Accuracy in Bits                 | 13 bits      | 28.5 bits        |
+| Output Accuracy as Number               | 0 – 8,191    | 8192 - 379625062 |
+| Accuracy | Exact! (Always rounded down) | Either Rounded Up or Down       |
+```
 
 **Impact:** Major (on smaller numbers only)
 
@@ -682,7 +677,7 @@ Using the built-in floating-point, exposed with`Math.Sqrt(someDouble)` in C#, w
 * Peter Lawrey, Dec 10 2010  [https://stackoverflow.com/questions/4407839/how-can-i-find-the-square-root-of-a-java-biginteger/4407948#4407948](https://stackoverflow.com/questions/4407839/how-can-i-find-the-square-root-of-a-java-biginteger/4407948#4407948)
 * Mar 23 ‘16 at 20:15 [https://stackoverflow.com/a/36187890/2352507](https://stackoverflow.com/a/36187890/2352507)
 
-### Optimization: Using the hardware’s double square root to initialize the first 53 bits of larger numbers
+### Optimization - Using the hardwares double square root to initialize the first 53 bits of larger numbers
 
 If we want to find the square root of a larger number that is over the 53-bits we can get directly from the hardware, we can just reduce the size by right shifting it, then do the hardware square root, then re-inflate the size by left shifting. This will leave us with the answer but only with the first 53 bits.
 
@@ -717,10 +712,10 @@ On my CPU it saves about 0.8 µs on a calculation.  On a smaller number, like 1
 * Java’s BigDecimal Sqrt method since version 9. [java/9 : java.base/java/math/MutableBigInteger.java (yawk.at)](https://code.yawk.at/java/9/java.base/java/math/MutableBigInteger.java#java.math.MutableBigInteger%23sqrt())
 * Max Klaxx, September 15, 2020  [https://stackoverflow.com/questions/3432412/calculate-square-root-of-a-biginteger-system-numerics-biginteger/63909229#63909229](https://stackoverflow.com/questions/3432412/calculate-square-root-of-a-biginteger-system-numerics-biginteger/63909229#63909229)
 
-### Optimization: Using precision reached or pre-calculated number of Newton iterations
+### Optimization - Using precision reached or pre-calculated number of Newton iterations
 
 When doing the Newton’s by hand in binary one can quickly see that each iteration doubles the precision. The number of steps can be pre-calculated or the precision can be monitored as the answer grows.  This is better than checking to see if the answer is correct or has stopped changing as that requires more compute.
-
+```c#
     shiftX = xLenMod - (3 * size);
     while (size < wantedPrecision)  <-----Escape here when desired precision met.
     {
@@ -732,8 +727,7 @@ When doing the Newton’s by hand in binary one can quickly see that each iterat
        shiftX -= 3 * size;
        size <<= 1;
     }
-
-  
+```
 
 **Impact:** Major
 
@@ -744,7 +738,7 @@ When doing the Newton’s by hand in binary one can quickly see that each iterat
 * Fava, 8 September 2007 - [Java BigDecimal square root method (archive.org)](https://web.archive.org/web/20180409195411/http:/allergrootste.com/big/Retro/blog/sec/archive20070915_295396.html)
 * Brian Burkhalter, September, 9 2015, [\[JDK-4851777\] Add BigDecimal sqrt method - Java Bug System](https://bugs.openjdk.java.net/browse/JDK-4851777?focusedCommentId=13847456&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-13847456)
 
-### Optimization: Binary search tree for selecting best optimization by scale
+### Optimization - Binary search tree for selecting best optimization by scale
 
 A binary tree that can find the best method to handle an input of a given size is useful. This is borderline obvious and the impact on this is minor, but I wanted to include it. 
 
@@ -756,18 +750,17 @@ Description automatically generated](other/images/NewtonPlusFastSqrtBinaryBranch
 
 **Impact:** Minor
 
-### Optimization: Cast to long before sqrt hardware fast results up to 6.7e7.
+### Optimization - Cast to long before sqrt hardware fast results up to 6.7e7.
 
 This one might be a C# thing but casing a double to long before the sqrt will result in a little bit of extra performance.  
 
 Example:
-
+```c#
     if (xAsDub < 67108864) 
     {
         return (int)Math.Sqrt((ulong)xAsDub);
     }
-
-  
+```
 
 This only works for numbers under 67108864.
 
@@ -779,36 +772,33 @@ This only works for numbers under 67108864.
 
 * Max Klaxx, March 2021  [https://stackoverflow.com/questions/3432412/calculate-square-root-of-a-biginteger-system-numerics-biginteger/63909229#63909229](https://stackoverflow.com/questions/3432412/calculate-square-root-of-a-biginteger-system-numerics-biginteger/63909229#63909229)
 
-### Optimization:  Grow the datatype (BigInteger) with the precision.
+### Optimization - Grow the BigInteger datatype with the precision
 
 This optimization is borderline obvious, but I will include it. When performing Newton’s method, only spend time calculating the bits that are in-precision. We may get some initial guess, say 53 bits, so we do not need to start working on a container the full size of the result at the start. It is only the last step we would do this.  
 
 If one just did Newton’s method directly using **_while(desired\_precision\_not_met) V = (V + X/V) / 2_ **without downshifting, they we are doing lots of un-needed compute. It seems obvious but, in the beginning, this is not clear.
 
 To show this, say we are calculating the sqrt of some number that is 600 bits. A naive approach would be to work with all the 600 bits of “X” the entire time. The table below shows the time taken of working with the full width the entire time.
-
-|     |     |     |     |     |     |     |     |     |     |     |     |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|     | 64-bit Memory Segments For BigInteger Storage |     |     |     |     |     |     |     |     |     | Time |
+```
+|   64-bit Memory Segments For BigInteger Storage                           | Time   |
 | Newton Loop 1 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 | 576 | 600 | 9*9=81 |
 | Newton Loop 2 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 | 576 | 600 | 9*9=81 |
 | Newton Loop 3 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 | 576 | 600 | 9*9=81 |
 | Newton Loop 4 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 | 576 | 600 | 9*9=81 |
-|     |     |     |     |     |     |     |     |     |     |     | 204 |
-
+                                                                            |    204 |
+```
 But we do not need to calculate all of this.  The darker shaded area is outside of the current precision, so these calculations can just be skipped!
 
 A better solution would be to grow the calculation as the precision increases. In each iteration, when the number of in-precision bits grows we would also grow the number size. 
+```
 
-|     |     |     |     |     |     |     |     |     |     |     |     |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-|     | 64-bit Memory Segments For BigInteger Storage |     |     |     |     |     |     |     |     |     | Time |
-| Newton Loop 1 | 64  | 128 |     |     |     |     |     |     |     |     | 2*2=4 |
+|    64-bit Memory Segments For BigInteger Storage                          | Time   |
+| Newton Loop 1 | 64  | 128 |     |     |     |     |     |     |     |     | 2*2=4  |
 | Newton Loop 2 | 64  | 128 | 192 | 256 |     |     |     |     |     |     | 4*4=16 |
 | Newton Loop 3 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 |     |     | 8*8=64 |
 | Newton Loop 4 | 64  | 128 | 192 | 256 | 320 | 384 | 448 | 512 | 576 | 600 | 9*9=81 |
-|     |     |     |     |     |     |     |     |     |     |     | 165 |
-
+                                                                            |    165 |
+```
 Since the calculations get exponentially more expensive with larger numbers, shortening these makes a large impact. First table shows that it took 204 units of time vs. 165 units of time.
 
 **Impact:** Major (no impact on numbers below 1e30, large impact on larger numbers)
@@ -817,15 +807,14 @@ Since the calculations get exponentially more expensive with larger numbers, sho
 
 **Used by:** commonly used (example:s Java’s BigInteger Sqrt)
 
-### Optimization: A fast flooring method
+### Optimization - A fast flooring method
 
 If we are trying to find the sqrt of 15, for example, and our answer is 4 then there was a round up somewhere. This happens often in both the hardware sqrt and in software. The expected behavior out of a sqrt is to floor (round down) the result. So, in that example 3 would be correct.  We could have discovered this round-up by simply squaring our answer of 4, to get 16.  If 16 is greater than our 15 then the answer is too high, and it needs to be brought down with a simple decrement.
-
+```c#
     //// Detect and repair a round-up (i.e. 101010.11111111101)
     if (result * result > x)
         result--;
-
-  
+```
 
 Overall, this method is much faster than doing a full Newton iteration and checking if the result stabilized.  This has 3 operations: (1) multiply (2) a compare with the large x and a (3) decrement.
 
@@ -839,10 +828,10 @@ This can be optimized even further; we only need to calculate and compare the sm
 
 * Jan Schultke in Aug 2020([https://stackoverflow.com/a/63457507/2352507](https://stackoverflow.com/a/63457507/2352507)). I did not see it used by anyone else.
 
-### Optimization: Extend hardware Sqrt to 1.45e17 by flooring result
+### Optimization - Extend hardware Sqrt to 1.45e17 by flooring result
 
 The hardware `Sqrt` function that is part of the double will yield us about 53 bits.
-
+```c#
     if (x < 144838757784765629)    // 1.448e17 = ~1<<57
     {
         uint vInt = (uint)Math.Sqrt((ulong)x);
@@ -851,8 +840,7 @@ The hardware `Sqrt` function that is part of the double will yield us about 53 b
     
         return vInt;
     }
-
-  
+```
 
 **Impact:** Minor, very small numbers only
 
@@ -860,19 +848,18 @@ The hardware `Sqrt` function that is part of the double will yield us about 53 b
 
 **Used by:** none - personal observation
 
-### Optimization: Use a “+1” on the hardware sqrt for up to 4e31 (Depreciated)
+### Optimization - Use a - plus 1 - on the hardware sqrt for up to 4e31 - Depreciated
 
 _NOTE: This optimization has been **depreciated** and is not in the current draft._
 
 If we increment x before, the result is correct between 2e16 and 2e31.
-
+```c#
     if (xAsDub < 4e31 && xAsDub > 2e16)  
     {
         long v = (long)Math.Sqrt(BitConverter.Int64BitsToDouble(BitConverter.DoubleToInt64Bits(xAsDub) + 1));
         return (v + (x / v)) >> 1;
     }
-
-  
+```
 
 **Impact:** Minor – only helps in the range 2e16 to 2e31
 
@@ -880,19 +867,18 @@ If we increment x before, the result is correct between 2e16 and 2e31.
 
 **Used by:** none – something found with experimentation
 
-### Optimization: Checking if over or under by 1. (Depreciated)
+### Optimization - Checking if over or under by 1 - Depreciated
 
 _NOTE: This optimization has been **depreciated** and is not in the current draft._
 
 This is much like one of the prior ones but supports underflow by 1.
-
+```c#
     BigInteger valSq = val * val;
     if (valSq > tempX)
         val--;
     else if ((valSq + (val << 1) + 1) >= tempX)
         val++;
-
-  
+```
 
 **Impact:** Minor
 
@@ -904,12 +890,12 @@ This is much like one of the prior ones but supports underflow by 1.
 * Michael DiLeo, Aug 2015 [Euler-Challenges-v2/MyExtensions.cs at 962f981c87e394773507bc00a708fdae202aa61c · pilotMike/Euler-Challenges-v2 (github.com)](https://github.com/pilotMike/Euler-Challenges-v2/blob/962f981c87e394773507bc00a708fdae202aa61c/EulerTools/Extensions/MyExtensions.cs)
 * Max Klaxx, March 2021  [https://stackoverflow.com/questions/3432412/calculate-square-root-of-a-biginteger-system-numerics-biginteger/63909229#63909229](https://stackoverflow.com/questions/3432412/calculate-square-root-of-a-biginteger-system-numerics-biginteger/63909229#63909229)
 
-### Optimization: Handling final rounding issues with extra bits from final iteration. (Depreciated)
+### Optimization - Handling final rounding issues with extra bits from final iteration - Depreciated
 
 _NOTE: This optimization has been **depreciated** and is not in the current draft._
 
 An annoying issue with rounding that would creep up is that the dreaded XXXX.11111111111101 type results that would round up.  At first I carried a growing extra set of bits and if these resulted in a 11111111’s style number I would detect and round down. Later, after looking at the binary output, it seemed better to just search the decimal binary bits (but skip the last BITS\_IN\_BACK) zero. If it was zero, then we have suspected round up.  However, there were instances when this would fail and it happened when the leading bits were had several 1’s. (i.e. 11111111101001…).  In either of these cases, we had a suspected round up at hand.  I would have to admit that this was more of a guess, so if any part has an error, it would be this.
-
+```c#
     const int BITS_IN_BACK  = 4; // 3-4 (when FRONT==8)
     const int BITS_IN_FRONT = 8; // 1-10(when BACK==3)
     BigInteger mask = ((BigInteger.One << (curShift - Size - BITS_IN_BACK)) - 1) << BITS_IN_BACK;
@@ -922,7 +908,7 @@ An annoying issue with rounding that would creep up is that the dreaded XXXX.111
         && ((x.GetBitLength() % 2) == 1)))
     if (val * val > x)
     val--;
-
+```
 
 **Impact:** Minor (no impact on numbers below 4e127, large impact on larger numbers)
 
@@ -931,7 +917,7 @@ An annoying issue with rounding that would creep up is that the dreaded XXXX.111
 Further Possible Optimization Ideas - for the rest of the world
 ------------------------------------------------------
 
-### Possible Optimization: A faster “val * val”
+### Possible Optimization - A faster val x val
 
 This section was already talked earlier but wanted to bring it up again.
 
@@ -944,7 +930,7 @@ In the above we are calculating the full answer of V2, but we really only need t
 Calculating the bottom half of V2 and then subtracting a subset of bits in x will give us the new bits. These new additional bits can then be appended to the current v we have been building.
 
 I attempted this in C# but .net’s BigInteger does not really allow us to calculate only the bottom half of v*v.  I did try the `ModPow()` but it did not seem like the performance was that great because ModPow is doing division where I really just want to stop calculating v*v halfway through.  Also, my implementation had some errors and was not always correct.  A custom BigInteger class may need to be built.   
-
+```c#
     void NewtonPlus5(BigInteger x, int xLenMod, ref int size, ref BigInteger val)
     {
         BigInteger tmp2 = (BigInteger.ModPow(val, 2, BigInteger.One << (size + 1)) << (size));
@@ -954,8 +940,7 @@ I attempted this in C# but .net’s BigInteger does not really allow us to calcu
         val = (val << (size + 1)) + (valSU2 / val);
         size = (size << 1) + 1;
     }
-
-  
+```
 
 Another way is we can kind of do this is to remove the top 25% of the bits in v before the  “v * v”.
 
@@ -965,12 +950,11 @@ Another way is we can kind of do this is to remove the top 25% of the bits in v 
 
 **Source:** None – personal idea
 
-
-### Possible Optimization: Concatenating val and X / val Instead of Shifting and Adding
+### Possible Optimization - Concatenating Instead of Shifting and Adding
 A fundamental part of a Newton iteration consists of two components (1) the left-shifted version of val being added to (2) the quotient X / val
 
 Traditionally, this is computed as:
-```
+```c#
 val = (v << shiftAmt) + (tempX / v);
 ```
 However, when examining val in binary across iterations, an interesting pattern emerges:
@@ -981,17 +965,17 @@ Iteration 5: v = (v + x / v) / 2  10110101000001001111001100110011
 ```
 The left portion of the bits in Iteration 5 are derived from Iteration 4's 'v << shiftAmt', while the right portion (last half of bit on iteration 5) corresponds to 'x / v'. Instead of performing an explicit left shift and addition, we could concatenate the bits directly, eliminating unnecessary operations.
 
-#### Challenges in C# and Carry Propagation
+#### Challenges in C-Sharp and Carry Propagation
 In theory, this approach avoids the computational cost of shifting and adding by directly appending bits, making it a compelling optimization. However, in practice, two key issues arise:
 
-#### 1. BigInteger Limitations in C#
+#### 1. BigInteger Limitations in C-Sharp
  - The BigInteger class in C# does not natively support bit-level manipulation for the most part. It does offer some tools for this such as TryWriteBytes and stackalloc but its not enough control. 
 #### 2. Carry Issue at the Overlapping Boundary
  - When concatenating val and X / val, their bit representations overlap slightly in the middle. If this overlapping region consists of all 1s (e.g., 1111111111111), the concatenation could cause a rounding effect, incrementing higher-order bits.
  - While this issue can be handled by detecting and adjusting carries, the additional logic negates any performance gain in C#.
  - However, in a lower-level language like C, where memory control is more fine-grained, we can efficiently manage this in a scratchpad buffer without unnecessary memory copies.
 
-#### Alternative Approach: Pre-allocated val Buffer
+#### Alternative Approach - Pre-allocated val Buffer
 To further optimize memory usage, we could preallocate the full space for val upfront and incrementally fill in the X / val bits during each iteration. This ensures that we only write the final val once, avoiding unnecessary memory copies. While this is feasible in C#, it requires deeper control over memory, which is more naturally suited for C or similar low-level environments.
 
 **Impact:** Unknown
@@ -1000,23 +984,22 @@ To further optimize memory usage, we could preallocate the full space for val up
 
 **Source:** Personal research and experimentation
 
-### Possible Optimization: Using extra lucky bits
+### Possible Optimization - Using extra lucky bits
 
 On each Newton Iteration we sometimes get some free bits of accuracy on accident because of lucky guesses. If you look at **Iteration 3** below we recieved 5 bits of accuracy by luck,  When the next Newton iteration happens, it amplifies these accidents by two.
 
 Maybe we can detect these and use this to our advantage. There would be some overhead however so the usefulness would probably be minimal (or any at all). To limit the overhead, we could try and detect these in every x number of loops – maybe every 4 or 8 iterations.
 
 Here is an example of this. The underlined bits would be guaranteed in precision. The red-bold bits are lucky guesses. Iteration 1 has no lucky guesses. Iteration 2 has 5 lucky guesses! Iteration 3 has 2 lucky guesses (last two zeros) and the doubling effect of the previous line (so 2*5 + 2), etc. This is more of a drastic example for demonstration.
-
-_Initial Guess:                           100000000000000000000000000000000000000000000000000  
+```
+Initial Guess:                    100000000000000000000000000000000000000000000000000  
 iteration 1: v = (v + x / v) / 2  110000000000000000000000000000000000000000000000000  
 iteration 2: v = (v + x / v) / 2  101101010101010101010101010101010101010101010101010  
 iteration 3: v = (v + x / v) / 2  101101010000010100000101000001010000010100000101000  
 iteration 4: v = (v + x / v) / 2  101101010000010011110011001100111111101010111110110  
 iteration 5: v = (v + x / v) / 2  101101010000010011110011001100111111100111011110011  
-iteration 6: v = (v + x / v) / 2  101101010000010011110011001100111111100111011110011_
-
-  
+iteration 6: v = (v + x / v) / 2  101101010000010011110011001100111111100111011110011
+```
 
 How many free bits can we expect to get? Half the time we happen to get 1 bit, a quarter of the time we get the first 2 bits. An eighth of the time - 3 bits, etc.   So, ½ + ¼ + 1/8 + 1/16 + 1/32.. = 1 bit (on average per row, but amplified on following rows)
 
@@ -1030,15 +1013,15 @@ I have not done anything with this because of the small performance gain. Also, 
 
 **Source:** None – personal idea
 
-### Possible Optimization: Use Mutable Big Integers (Platform Performance improvement)
+### Possible Optimization - Use Mutable Big Integers - Platform Performance improvement
 
 Use mutable BigIntegers instead of the unchangeable immutable BigInteger struct – internal only. In C#, the memory assigned to a BigInteger cannot be modified so any modifications, even as simple as an increment, forces a new memory allocation. The benefits only grow with larger numbers and will result in better Big O type performance.  Java does support this however using the following structure: X.add(1).divide(2) 
 
 **Impact:** Medium
 
 **Class:** Hardware-Software-Specific (complier/language feature)
-
-### Possible idea: Use a native wrapper in c (Platform Performance improvement)
+   
+### Possible Optimization - Use a native wrapper in c - Platform Performance improvement
 
 This project can be translated into a C function that would be even faster. C tends to have better performance to do the extensive pre-compiler and has less limitations as memory can be access directly. The C function could then be exposed to other higher-level languages like via a wrapper. Since the c native call would have a slight overhead it would make sense to only use it for larger versions calculations… maybe the `SqrtForReallyBigInts()` can be native only. Native wrapper functions are more problematic though and not as portable.
 
@@ -1046,8 +1029,8 @@ This project can be translated into a C function that would be even faster. C te
 
 **Class:** Hardware-Software-Specific (complier/language feature)
 
-How did this function come about?
----------------------------------
+How this function come about
+----------------------------
 
 For a project I was working on, I needed a Big Integer square root function. I looked around, found a few, and selected one I liked. The one I liked was not on a site I use, called StackOverflow, so [re-posted it](https://stackoverflow.com/a/58697726/2352507) (with credit to the author/date). After some time passed, there was a post by MaxKlaxx. MaxKlaxx posted benchmarks comparing his and several others and it included the one I re-posted as SunsetQuest – even though it was not mine. The one with Sunsetquest was one of the lowest performers and if anyone knows much about me, I’m all about efficient code – duh!  So, I set out to make my own sqrt function that would outperform MaxKlaxx's Sqrt.
 
@@ -1060,6 +1043,6 @@ With all these working together, the square root ends up being super quick. For 
 
 Thank you to the following
 --------------------------
-Thank you to the authors/supporters of [Convert HTML to Markdown](https://www.convertsimple.com/convert-html-to-markdown/)  for making a tool to convert this to markdown for here.
-Thank you to the authors at [GitHub Wiki TOC generator](https://ecotrust-canada.github.io/markdown-toc/) for making a tool to convert this to markdown for here.
+ - Thank you to the authors/supporters of [Convert HTML to Markdown](https://www.convertsimple.com/convert-html-to-markdown/)  for making a tool to convert this to markdown for here.
+ - Thank you to the authors at [GitHub Wiki TOC generator](https://ecotrust-canada.github.io/markdown-toc/) for making a tool to convert this to markdown for here.
 
