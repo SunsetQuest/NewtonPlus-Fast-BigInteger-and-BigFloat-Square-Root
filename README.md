@@ -262,15 +262,15 @@ Random Notes:
 * The yellow is the speed-up. It is just the NewtonPlus / JavasSqrt.
 * It is up to 50X (5000%) faster for numbers around 10240 bits in length. For larger numbers, I would expect this to be even higher like the C# chart.
 
-![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtInJava2Chart.jpg)
+![](other/images/NewtonPlusFastSqrtInJava2Chart.jpg)
 
 Below we zoomed in on the vertical direction to get better look.
 
-![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtInJava3Chart.jpg)
+![](other/images/NewtonPlusFastSqrtInJava3Chart.jpg)
 
 A logarithmic view provides the best look.  I think this is best at showing the comparison. Each horizontal line represents a 2X performance gain. A yellow speed-up is also shown here that uses the right-side axes. The speedup is just the NewtonPlus time divided by the Java version.
 
-![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtInJava4Chart.jpg)
+![](other/images/NewtonPlusFastSqrtInJava4Chart.jpg)
 
 ### The Code (Java version)
 
@@ -555,19 +555,19 @@ On **Line 13**, we upshift V and then add it to T on **Line 14**.  One could ar
 
 Here it is in more of a math-like format…
 
-![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtMath5.png)
+![](other/images/NewtonPlusFastSqrtMath5.png)
 
-![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtMath6.png)
+![](other/images/NewtonPlusFastSqrtMath6.png)
 
-![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtMath7.png)
+![](other/images/NewtonPlusFastSqrtMath7.png)
 
 Or with concatenation…  
-               ![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtMath8.png)
+               ![](other/images/NewtonPlusFastSqrtMath8.png)
 
 Random Notes:
 
-* ![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtMath9.png) is simply the length in bits of the input X.
-* ![](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtMath10.png) is only calculated once.   Basically, if the length of X is odd then we add 1. This number should be always even.
+* ![](other/images/NewtonPlusFastSqrtMath9.png) is simply the length in bits of the input X.
+* ![](other/images/NewtonPlusFastSqrtMath10.png) is only calculated once.   Basically, if the length of X is odd then we add 1. This number should be always even.
 
 #### Further Enhancing Newton Plus
 
@@ -749,7 +749,7 @@ The below example shows 4 levels deep…
 
 ![Text
 
-Description automatically generated](images/NewtonPlusFastSquareRoot/NewtonPlusFastSqrtBinaryBranching11Chart.jpg)
+Description automatically generated](other/images/NewtonPlusFastSqrtBinaryBranching11Chart.jpg)
 
 **Impact:** Minor
 
@@ -963,32 +963,42 @@ Another way is we can kind of do this is to remove the top 25% of the bits in v 
 
 **Source:** None – personal idea
 
-### Possible idea: Concatenating “val” and “X/Val” instead of Shifting and Adding
 
-The basic part of a Newton Iteration is two parts: (1) as left shifted version of v part and the “x/v”:
+### Possible Optimization: Concatenating val and X / val Instead of Shifting and Adding
+A fundamental part of a Newton iteration consists of two components (1) the left-shifted version of val being added to (2) the quotient X / val
 
-        val = (val << shiftAmt) + (tempX / val)
+Traditionally, this is computed as:
+```
+val = (v << shiftAmt) + (tempX / v);
+```
+However, when examining val in binary across iterations, an interesting pattern emerges:
 
-  
+```
+Iteration 4: v = (v + x / v) / 2  1011010100000100  
+Iteration 5: v = (v + x / v) / 2  10110101000001001111001100110011
+```
+The left portion of the bits in Iteration 5 are derived from Iteration 4's 'v << shiftAmt', while the right portion (last half of bit on iteration 5) corresponds to 'x / v'. Instead of performing an explicit left shift and addition, we could concatenate the bits directly, eliminating unnecessary operations.
 
-But when viewing the current v in binary something stands out.
+#### Challenges in C# and Carry Propagation
+In theory, this approach avoids the computational cost of shifting and adding by directly appending bits, making it a compelling optimization. However, in practice, two key issues arise:
 
-_    Iteration 4: v = (v + x / v) / 2 1011010100000100  
-    Iteration 5: v = (v + x / v) / 2 10110101000001001111001100110011_
+#### 1. BigInteger Limitations in C#
+ - The BigInteger class in C# does not natively support bit-level manipulation for the most part. It does offer some tools for this such as TryWriteBytes and stackalloc but its not enough control. 
+#### 2. Carry Issue at the Overlapping Boundary
+ - When concatenating val and X / val, their bit representations overlap slightly in the middle. If this overlapping region consists of all 1s (e.g., 1111111111111), the concatenation could cause a rounding effect, incrementing higher-order bits.
+ - While this issue can be handled by detecting and adjusting carries, the additional logic negates any performance gain in C#.
+ - However, in a lower-level language like C, where memory control is more fine-grained, we can efficiently manage this in a scratchpad buffer without unnecessary memory copies.
 
-The left underlined side is from the “val << shiftAmt” and the red bold side is the “tempX/val”. So, we can just really do a concatenation instead. The left shift and add is work that does not need to be done. We can just really append the bits together.  
-
-So, in my C# example I do the shift and add version because the `BigInteger` class I am using does not support concatenation. However, this can still be done by creating a custom `BigInteger` class with this property. 
-
-Also, to prevent unnecessary memory copies the full space for v could be reserved. And we just fill in the “x/v” part (red bold bits above) with iterations. So we just write the result V once!
+#### Alternative Approach: Pre-allocated val Buffer
+To further optimize memory usage, we could preallocate the full space for val upfront and incrementally fill in the X / val bits during each iteration. This ensures that we only write the final val once, avoiding unnecessary memory copies. While this is feasible in C#, it requires deeper control over memory, which is more naturally suited for C or similar low-level environments.
 
 **Impact:** Unknown
 
-**Class:** Fundamental and platform
+**Class:** Fundamental and platform-specific
 
-**Source:** None – personal idea
+**Source:** Personal research and experimentation
 
-### Possible idea: Using extra lucky bits
+### Possible Optimization: Using extra lucky bits
 
 On each Newton Iteration we sometimes get some free bits of accuracy on accident because of lucky guesses. If you look at **Iteration 3** below we recieved 5 bits of accuracy by luck,  When the next Newton iteration happens, it amplifies these accidents by two.
 
@@ -1018,7 +1028,7 @@ I have not done anything with this because of the small performance gain. Also, 
 
 **Source:** None – personal idea
 
-### Possible idea: Use Mutable Big Integers (Platform Performance improvement)
+### Possible Optimization: Use Mutable Big Integers (Platform Performance improvement)
 
 Use mutable BigIntegers instead of the unchangeable immutable BigInteger struct – internal only. In C#, the memory assigned to a BigInteger cannot be modified so any modifications, even as simple as an increment, forces a new memory allocation. The benefits only grow with larger numbers and will result in better Big O type performance.  Java does support this however using the following structure: X.add(1).divide(2) 
 
