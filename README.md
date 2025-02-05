@@ -1,48 +1,51 @@
-﻿Update: 2/3/2025 - A new version of Sqrt function with a good performance boost for larger numbers will be released in the day or so. The new version is called Newton Plus and is about 2X faster for numbers around 1e1000000. The old version is still available in the repo and is just as fast for smaller numbers.
+**﻿2/3/2025 Update:** A new version of Sqrt function with a good performance boost for larger numbers will be released in the day or so. The new version is called Newton Plus and is about 2X faster for numbers around 1e1000000. The old version is still available in the repo and is just as fast for smaller numbers.
 
-See CodeProject site for best formated and latest article:  https://www.codeproject.com/Articles/5321399/NewtonPlus-A-Fast-Big-Number-Square-Root-Function
+This article was originally posted on [CodeProject](https://www.codeproject.com/Articles/5321399/NewtonPlus-A-Fast-Big-Number-Square-Root-Function/)
 
-Thank you to the authors at https://www.convertsimple.com/convert-html-to-markdown/ for making a tool to convert this to markdown for here.
+
 
 Contents
 --------
-
-* **[Introduction](#_Introduction)**
-* **[C# Version](#_CS_Version)**
-    *     [Performance Benchmarks](#_Benchmarks)
-    *     [The Code (C# version)](#_CS_Code)
-    *     [Floating Point Version / Adapter](#_Floating_Point_Version)
-    *     [Round-to-Nearest Integer Version / Adapter](#_Round_to_Nearest_Integer_Version)
-    *     [Testing](#_Verification)
-* **[Java version](#_Java_Version)**
-    *     [Performance Chart](#_Java_Performance_Chart)
-    *     [The Code (Java version)](#_Java_Code)
-* **[World’s Fastest Square Root for Big Numbers?](#_Worlds_Fastest_Square_Root)**
-* **[Optimizations](#_Optimizations)**
-    *     [Optimization: Shrinking the division (Newton Plus)](#_Newton_Plus)
-        *         [The Code](#_Shrinking_the_division_Code)
-        *         [An Example](#_Examples)
-        *         [Further Enhancement](#_Further_Enhancement)
-    *     [Optimization: Use a starting size, that when doubled repeatedly, ends up at the correct precision.](#_Toc97577214)
-        *         [Generate the starting size efficiently](#_Toc97577215)
-    *     [Optimization: Using the hardware square root for small numbers directly](#_Toc97577216)
-    *     [Optimization: Using the hardware’s double square root for the first 53 bits of larger numbers](#_Toc97577217)
-    *     [Optimization: Using precision reached or pre-calculated number of Newton iterations](#_Toc97577218)
-    *     [Optimization: Binary search tree for selecting best optimization by scale](#_Toc97577219)
-    *     [Optimization: Cast to long before sqrt hardware fast results up to 6.7e7.](#_Toc97577220)
-    *     [Optimization: Grow the datatype (BigInteger) with the precision.](#_Toc97577221)
-    *     [Optimization: A fast flooring method](#_Toc97577222)
-    *     [Optimization: Extend hardware Sqrt to 1.45e17 by flooring result](#_Toc97577223)
-    * ~    [Optimization: Use a “+1” on the hardware sqrt for up to 4e31 (Depreciated)](#_Toc97577224)~
-    * ~    [Optimization: Checking if over or under by 1. (Depreciated)](#_Toc97577225)~
-    * ~    [Optimization: Handling final rounding issues with extra bits from final iteration. (Depreciated)](#_Toc97577226)~
-* **[Further optimization Ideas - for the rest of the world to work on](#_Further_Enhancement_Ideas)**
-    *     [Possible idea: A faster “val * val”](#_Toc97577228)
-    *     [Possible idea: Concatenating “val” and “X/Val” instead of Shifting and Adding](#_Toc97577229)
-    *     [Possible idea: Using extra lucky bits](#_Toc97577230)
-    *     [Possible idea: Use Mutable Big Integers (Platform Performance improvement)](#_Toc97577231)
-    *     [Possible idea: Use a native wrapper in c (Platform Performance improvement)](#_Toc97577232)
-* **[How did this function come about?](#_How_did_this_function_come_about)**
+- [Introduction](#introduction)
+- [C# Version](#c--version)
+  * [Performance Benchmarks](#performance-benchmarks)
+  * [The Code (C# version)](#the-code--c--version-)
+  * [Floating Point Version / Adapter](#floating-point-version---adapter)
+  * [Round-to-Nearest Integer Version / Adapter](#round-to-nearest-integer-version---adapter)
+  * [Testing](#testing)
+- [Java version](#java-version)
+  * [Performance Chart](#performance-chart)
+  * [The Code (Java version)](#the-code--java-version-)
+- [World’s Fastest Square Root for Big Numbers?](#world-s-fastest-square-root-for-big-numbers-)
+- [Optimizations](#optimizations)
+  * [Optimization: Shrinking the division (Newton Plus)](#optimization--shrinking-the-division--newton-plus-)
+    + [The Code for Newton Plus](#the-code-for-newton-plus)
+    + [An Example of Newton Plus](#an-example-of-newton-plus)
+    + [Further Enhancing Newton Plus](#further-enhancing-newton-plus)
+  * [Optimization: Use a starting size, that when doubled repeatedly, ends up at the correct precision.](#optimization--use-a-starting-size--that-when-doubled-repeatedly--ends-up-at-the-correct-precision)
+    + [Generate an efficient starting size](#generate-an-efficient-starting-size)
+  * [Optimization: Using the hardware square root for small numbers directly](#optimization--using-the-hardware-square-root-for-small-numbers-directly)
+  * [Optimization: Using the hardware’s double square root to initialize the first 53 bits of larger numbers](#optimization--using-the-hardware-s-double-square-root-to-initialize-the-first-53-bits-of-larger-numbers)
+  * [Optimization: Using precision reached or pre-calculated number of Newton iterations](#optimization--using-precision-reached-or-pre-calculated-number-of-newton-iterations)
+  * [Optimization: Binary search tree for selecting best optimization by scale](#optimization--binary-search-tree-for-selecting-best-optimization-by-scale)
+  * [Optimization: Cast to long before sqrt hardware fast results up to 6.7e7.](#optimization--cast-to-long-before-sqrt-hardware-fast-results-up-to-67e7)
+  * [Optimization:  Grow the datatype (BigInteger) with the precision.](#optimization---grow-the-datatype--biginteger--with-the-precision)
+  * [Optimization: A fast flooring method](#optimization--a-fast-flooring-method)
+  * [Optimization: Extend hardware Sqrt to 1.45e17 by flooring result](#optimization--extend-hardware-sqrt-to-145e17-by-flooring-result)
+  * [Optimization: Use a “+1” on the hardware sqrt for up to 4e31 (Depreciated)](#optimization--use-a---1--on-the-hardware-sqrt-for-up-to-4e31--depreciated-)
+  * [Optimization: Checking if over or under by 1. (Depreciated)](#optimization--checking-if-over-or-under-by-1--depreciated-)
+  * [Optimization: Handling final rounding issues with extra bits from final iteration. (Depreciated)](#optimization--handling-final-rounding-issues-with-extra-bits-from-final-iteration--depreciated-)
+- [Further Possible Optimization Ideas - for the rest of the world](#further-optimization-ideas---for-the-rest-of-the-world)
+  * [Possible Optimization: A faster “val * val”](#possible-idea--a-faster--val---val-)
+  * [Possible Optimization: Concatenating val and X / val Instead of Shifting and Adding](#possible-optimization--concatenating-val-and-x---val-instead-of-shifting-and-adding)
+    + [Challenges in C# and Carry Propagation](#challenges-in-c--and-carry-propagation)
+    + [1. BigInteger Limitations in C#](#1-biginteger-limitations-in-c-)
+    + [2. Carry Issue at the Overlapping Boundary](#2-carry-issue-at-the-overlapping-boundary)
+    + [Alternative Approach: Pre-allocated val Buffer](#alternative-approach--pre-allocated-val-buffer)
+  * [Possible Optimization: Using extra lucky bits](#possible-optimization--using-extra-lucky-bits)
+  * [Possible Optimization: Use Mutable Big Integers (Platform Performance improvement)](#possible-optimization--use-mutable-big-integers--platform-performance-improvement-)
+  * [Possible idea: Use a native wrapper in c (Platform Performance improvement)](#possible-idea--use-a-native-wrapper-in-c--platform-performance-improvement-)
+- [How did this function come about?](#how-did-this-function-come-about-)
 
 Introduction
 ------------
@@ -920,16 +923,15 @@ An annoying issue with rounding that would creep up is that the dreaded XXXX.111
     if (val * val > x)
     val--;
 
-  
 
 **Impact:** Minor (no impact on numbers below 4e127, large impact on larger numbers)
 
 **Source:** None – personal idea
 
-Further optimization Ideas - for the rest of the world
+Further Possible Optimization Ideas - for the rest of the world
 ------------------------------------------------------
 
-### Possible idea: A faster “val * val”
+### Possible Optimization: A faster “val * val”
 
 This section was already talked earlier but wanted to bring it up again.
 
@@ -1054,3 +1056,10 @@ Max’s algorithm was fast from small to large integers as it used the built-in 
 After several weeks of working on it here and there, I gave up and wrote “THIS PROJECT WAS A DISASTER!!!!!  1/8/2021”. But, after some time went by, ideas started bubbling up. The first one was basically trying to split the sqrt into smaller square roots. Long story short, that idea was a flop! But ideas kept flowing for some reason, usually in the middle of the night. The next idea was to pre-calculate the number of steps Newton steps instead of waiting for it to settle. The next idea was to start with an initial size so when we keep doubling the bit-width using Newton’s method, we end up with just the size needed. Finally, one more idea was to change up Newton’s method itself to make each division step smaller – I named this Newton Plus – though hindsight is maybe it should be Newton Minus since we are pre-subtracting some numbers. Let’s just say we are adding a negative number.
 
 With all these working together, the square root ends up being super quick. For larger numbers, this solution is 43X faster than the next fastest C# algorithm I could find. At first, I was trying to create something faster than everyone else but after some time it was just me trying to compete against myself.
+
+
+Thank you to the following
+--------------------------
+Thank you to the authors/supporters of [Convert HTML to Markdown](https://www.convertsimple.com/convert-html-to-markdown/)  for making a tool to convert this to markdown for here.
+Thank you to the authors at [GitHub Wiki TOC generator](https://ecotrust-canada.github.io/markdown-toc/) for making a tool to convert this to markdown for here.
+
