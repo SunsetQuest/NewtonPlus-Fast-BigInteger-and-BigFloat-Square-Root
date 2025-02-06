@@ -66,7 +66,7 @@ public static class BigIntegerSquareRoot
             int oversidedBy = size - wantedPrecision;
             //ulong saveDroppedDigits = (ulong)(saveDroppedDigitsBI >> downby);
 
-            uint simple = (uint)((val >> (oversidedBy-8)) & byte.MaxValue);
+            uint simple = (uint)((val >> (oversidedBy - 8)) & byte.MaxValue);
 
             ////////  Shrink result to wanted Precision  ////////
             val >>= oversidedBy;
@@ -74,12 +74,12 @@ public static class BigIntegerSquareRoot
             ////////  Detect a round-ups  ////////
             if ((simple == 0) && (val * val > x))
             {
-                
+
                 //Console.WriteLine(MiscTools.ToBinaryString2(simple));
                 val--;
             }
         }
-        else if (xLen > 1<<15)
+        else if (xLen > 1 << 15)
         {
             val = (val << (424 - 1)) + (x >> xLenMod - (3 * 424)) / val;
             size <<= 1;
@@ -97,12 +97,12 @@ public static class BigIntegerSquareRoot
             }
 
             int needToShiftBy = size - startingSize;
-                val >>= needToShiftBy;
+            val >>= needToShiftBy;
             size = startingSize;
             int finalSize = wantedPrecision + (4 << (numOfNewtonSteps)) + 4;
-            int xInv2Shift = finalSize - xLen % 2 -64; 
+            int xInv2Shift = finalSize - xLen % 2 - 64;
 
-            BigInteger xInv = InverseForLargeNumbersOnly(x, xLen, finalSize-64);
+            BigInteger xInv = InverseForLargeNumbersOnly(x, xLen, finalSize - 64);
 
             ////////  Divide-less Iterations  ////////
             BigInteger THREE = ((BigInteger)3);
@@ -113,7 +113,7 @@ public static class BigIntegerSquareRoot
                 //if (xInv2Shift - size< 67) Console.WriteLine(xInv2Shift - size);
                 BigInteger valSqrd = BigInteger.Pow(val, 2);
                 BigInteger rightSide = (THREE << size) - ((xInvShift2 * valSqrd) >> size);
-                val = (val * rightSide) >> ((size>>1) + 1+ EXTRA_BITS_TO_REMOVE);
+                val = (val * rightSide) >> ((size >> 1) + 1 + EXTRA_BITS_TO_REMOVE);
 
                 size -= EXTRA_BITS_TO_REMOVE;
                 //needToShiftBy = EXTRA_BITS_TO_REMOVE;
@@ -177,6 +177,10 @@ public static class BigIntegerSquareRoot
 
         return val;
     }
+
+
+
+
 
 
     private static BigInteger InverseForLargeNumbersOnly(BigInteger x, int xLen, int finalSize)
