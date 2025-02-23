@@ -8,6 +8,7 @@
 using System;
 using System.Diagnostics;
 using System.Numerics;
+using System.Threading;
 using System.Threading.Tasks;
 using static BigIntegerSquareRoot;
 
@@ -42,8 +43,8 @@ internal static class Test_BigIntegers
 
         if (print) Console.Write($"\r\n=================== TESTING: {Sqrt.Method.Name} =======================");
 
-        ////////////////////////// Verification 1 - Common Testing /////////////
-        if (print) Console.Write("\r\nVerification 1: Common Numbers /w issues test: ....");
+        ///////////////// Verification 1 - Testing Common Numbers with issues /////////////////
+        if (print) Console.Write("\r\nVerification 1: Testing Common Numbers with issues: ");
 
         try
         {
@@ -145,8 +146,8 @@ internal static class Test_BigIntegers
 
         if (print) Console.Write($"...Done  Errors so far: {failCount}");
 
-        ////////////////////////// Verification 2: Brute Force testing (starting at 0) //////////////////////////
-        if (print) Console.Write($"\r\nVerification 2: Brute Force test(starting at 0,1,2,3...)");
+        ///////////////// Verification 2: Brute Force Testing: (0,1,2,3,4...) /////////////////
+        if (print) Console.Write($"\r\nVerification 2: Brute Force Testing: (0,1,2,3,4...)");
         sw.Restart();
         //const long FULL_COVERAGE_TESTING_RANGE_MAX = (long)uint.MaxValue/2;// * 64; 
         for (long i = 0; i < long.MaxValue; i++) //0-138129003319
@@ -183,8 +184,8 @@ internal static class Test_BigIntegers
         //BruteForceStoppedAt = (long)6.6e9 3.24e11;  
 
 
-        ////////////////////////// Verification 3: 2^n + [-5 to +5] Testing //////////////////////////
-        if (print) Console.Write("\r\nVerification 3: Starting 2^n + [-5 to +5] test: ...");
+        ///////////////// Verification 3: Testing 2^n + [-5 to +5] /////////////////
+        if (print) Console.Write("\r\nVerification 3: Testing 2^n + [-5 to +5]: ");
         sw.Restart();
         for (long s = 0; s < long.MaxValue; s++)
         {
@@ -237,9 +238,9 @@ internal static class Test_BigIntegers
         }
 
 
-        ////////////////////////// Verification 4: 11111000000 Testing //////////////////////////
+        ///////////////// Verification 4: Testing 11111[n]00000[n] /////////////////
         // 10000, 11000, 11100, 11110, 11111 length=5  ->   & (1<<(b=1 to len)-1) << (len-b)   
-        if (print) Console.Write("\r\nVerification 4: Starting 11111[n]00000[n] test: ...");
+        if (print) Console.Write("\r\nVerification 4: Testing 11111[n]00000[n]: ");
         sw.Restart();
         int startAt = BitOperations.Log2((ulong)BruteForceStoppedAt) - 1;
         Parallel.For(startAt, 1000, new ParallelOptions { MaxDegreeOfParallelism = MaxDegreeOfParallelism }, (length, s) =>
@@ -268,9 +269,9 @@ internal static class Test_BigIntegers
         if (print) Console.Write($"...Done  Errors so far: {failCount}");
 
 
-        ////////////////////////// Verification 5: 1010101010101 Testing //////////////////////////
+        ///////////////// Verification 5: Testing 10101010101[n] /////////////////
         // 1,10,101,1010,10101 
-        if (print) Console.Write("\r\nVerification 5: Starting 10101010101[n].. test: ...");
+        if (print) Console.Write("\r\nVerification 5: Testing 10101010101[n]: ");
 
         sw.Restart();
         Parallel.For(startAt, 10000, new ParallelOptions { MaxDegreeOfParallelism = MaxDegreeOfParallelism }, (length, s) =>
@@ -311,9 +312,9 @@ internal static class Test_BigIntegers
         if (print) Console.Write($"...Done  Errors so far: {failCount}");
 
 
-        ////////////////////////// Verification 6: n^2 -[0,1] Testing //////////////////////////
+        ///////////////// Verification 6: Testing n^2 - (0,1) /////////////////
         //note: n^2 some overlap here with the "n^[2,3,5,6,7] + [-2,-1,0,1,2] Testing"
-        if (print) Console.Write("\r\nVerification 6: n^2 - (0,1) test: ...");
+        if (print) Console.Write("\r\nVerification 6: Testing n^2 - (0,1)");
         sw.Restart();
         Parallel.For(0L, (2L << 25), new ParallelOptions { MaxDegreeOfParallelism = MaxDegreeOfParallelism }, (x, s) =>
         //for (long x = 0; x < (1<<30); x++)
@@ -341,12 +342,14 @@ internal static class Test_BigIntegers
         if (print) Console.Write($"...Done  Errors so far: {failCount}");
 
 
-        ////////////////////////// Verification 7 //////////////////////////
-        if (print) Console.Write($"\r\nVerification 7: Random number testing...\r\n");
+        ///////////////// Verification 7 - Random number testing /////////////////
+        if (print) Console.Write($"\r\nVerification 7: Testing Random Numbers:\r\n");
         sw.Restart();
         Parallel.For(0, 32, new ParallelOptions { MaxDegreeOfParallelism = MaxDegreeOfParallelism }, (p, s) =>
         {
             Random r = new(p + RAND_SEED);
+            long swNextReport = sw.ElapsedTicks + 200000000L;
+
             int counter = 0;
             while (true)
             {
@@ -401,9 +404,14 @@ internal static class Test_BigIntegers
                     if (print) Console.WriteLine($" {(double)x} !!!!! {(lowerBound > x ? "Lo" : "Hi")}  {x}  {lowerBound - x} offby: {offby} byteCt:{byteCt}"); //   \t {lowerBound} , {a01} , {upperBound}");
                 }
 
-                if (counter++ % 0x1000000 == 0)
+                counter++;
+                if (print && sw.ElapsedTicks >= swNextReport)
                 {
-                    if (print) Console.WriteLine($"Status {string.Format("{0:T}", DateTime.Now)}: thread:{p}\tCount:{counter}\t2^{x.GetBitLength() - 1}/{(double)x} fails:{failCount}");
+                    swNextReport = 200000000L + (long)(sw.ElapsedTicks * 1.20); 
+                    if (print)
+                    {
+                        Console.WriteLine($"Status {string.Format("{0:T}", DateTime.Now)}: thread:{p,-3}Count:{counter,-8}2^{x.GetBitLength() - 1,6}/{(double)x} fails:{failCount}");
+                    }
                 }
 
                 testCt++;

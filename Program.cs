@@ -17,13 +17,10 @@ internal static class Program
     private static void Main()
     {
 #if !BENCHMARK1CORE
-        //////////////////////  Play Test Area  //////////////////////
+        //////////////////////  Play/Test Area  //////////////////////
 
-        // Testing...
-        //TestBigIntegerSqrt(SunsetQuestSqr0, testTimeInSeconds: 30, randomMaxBitSize: 4000, runIndefinitely: true);
-        //TestBigIntegerSqrt(SunsetQuestSqrtApprox, testTimeInSeconds: 60, randomMaxBitSize: 4000, runIndefinitely: true);
-        TestBigIntegerSqrt(SunsetQuestSqrt, testTimeInSeconds: 60, randomMaxBitSize: 80000, runIndefinitely: true);
-        //TestBigIntegerSqrt(SunsetQuestSqrtApprox, testTimeInSeconds: 10, randomMaxBitSize: 40000, runIndefinitely: true);
+        TestBigIntegerSqrt(SunsetQuestSqrt, testTimeInSeconds: 120, randomMinBitSize: 0, randomMaxBitSize: 1 << 18, runIndefinitely: true);
+        //TestBigIntegerSqrt(SunsetQuestSqrt, testTimeInSeconds: 120, randomMinBitSize: 0, randomMaxBitSize: 1 << 18, runIndefinitely: true);
         //Console.WriteLine("Any key to continue or exit."); Console.ReadLine();
 #endif
 
@@ -35,10 +32,10 @@ internal static class Program
 
         while (true)
         {
-            Benchmark(SunsetQuestSqAp, trialCount: 20, seconds: 2, skipSmallNumbers: false);
-            Benchmark(SunsetQuestSqrt, trialCount: 20, seconds: 2, skipSmallNumbers: false);
-            Benchmark(SunsetQuestSqAp, trialCount: 20, seconds: 2, skipSmallNumbers: false);
-            Benchmark(SunsetQuestSqrt, trialCount: 20, seconds: 2, skipSmallNumbers: false);
+            Benchmark(SunsetQuestSqrt, trialCount: 20, seconds: 3, skipSmallNumbers: false);
+            Benchmark(NewtonPlusSqrt, trialCount: 20, seconds: 3, skipSmallNumbers: false);
+            Benchmark(SunsetQuestSqrt, trialCount: 20, seconds: 3, skipSmallNumbers: false);
+            Benchmark(NewtonPlusSqrt, trialCount: 20, seconds: 3, skipSmallNumbers: false);
         }
         Console.ReadLine();
         // Full compare benchmark between past and new versions
