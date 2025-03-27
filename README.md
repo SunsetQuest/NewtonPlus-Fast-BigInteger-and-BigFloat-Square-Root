@@ -1,4 +1,35 @@
-**﻿2/3/2025 Update:** A new version of Sqrt function with a good performance boost for larger numbers will be released in the day or so. The new version is called Newton Plus and is about 2X faster for numbers around 1e1000000. The old version is still available in the repo and is just as fast for smaller numbers.
+# February 2025 Update: Performance Enhancements for Large-Number Square Root Calculations
+
+We're pleased to announce an enhanced version of our square root implementation called **SunsetQuestSqrt**, designed specifically for improved performance with extremely large numbers.
+
+## Performance Comparison
+
+| Function | Recommended Use Case | Performance Notes |
+| --- | --- | --- |
+| [SunsetQuestSqrt](https://github.com/SunsetQuest/NewtonPlus-Fast-BigInteger-and-BigFloat-Square-Root/blob/499778b3b53dcf8ecd0f3bb8dc901916c55375a4/BigIntegerSquareRoot.cs#L18) | Optimized for very large integers (>32,000 bits) | Utilizes inverse square root pre-calculation |
+| [NewtonPlusSqrt](https://github.com/SunsetQuest/NewtonPlus-Fast-BigInteger-and-BigFloat-Square-Root/blob/499778b3b53dcf8ecd0f3bb8dc901916c55375a4/BigIntegerSquareRoot.cs#L235C30-L235C44) | Recommended for integers <32,000 bits | Maintains optimal performance for standard use cases |
+
+## Performance Improvements
+
+The new implementation delivers significant speed improvements for large numbers:
+
+*   **1.5x faster** for 64K-bit integers (approximately 1e29000)
+*   **2x faster** for 128K-bit integers (approximately 1e38500)
+*   **6x faster** for 2M-bit integers (approximately 1e616000)
+
+## Implementation Approach
+
+This optimization stems from a valuable community contribution by "Member 14929321" (March 21, 2022), who proposed computing the inverse square root to avoid division operations:
+
+> You can speed up your square root calculation by not using divisions. You should start by computing the inverse square root. So if y = sqrt(x) and z = 1/sqrt(x), you use Newton approximation for the latter:
+> 
+> z\_{n+1} = z\_n (3 - x z\_n^2) / 2
+> 
+> Only three multiplications and a fast division by 2 is needed per iteration. After you found the inverse square root, you can compute the square root as: sqrt(x) = x / sqrt(x)
+> 
+> So you can do it without divisions: y = x z
+
+
 
 This article was originally posted on [CodeProject](https://www.codeproject.com/Articles/5321399/NewtonPlus-A-Fast-Big-Number-Square-Root-Function/)
 
