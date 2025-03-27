@@ -1,15 +1,17 @@
-# February 2025 Update: Performance Enhancements for Large-Number Square Root Calculations
+:new: February 2025 Update
+--------------------
+## Performance Enhancements for Large-Number Square Root Calculations
 
 We're pleased to announce an enhanced version of our square root implementation called **SunsetQuestSqrt**, designed specifically for improved performance with extremely large numbers.
 
-## Performance Comparison
+### Performance Comparison
 
 | Function | Recommended Use Case | Performance Notes |
 | --- | --- | --- |
 | [SunsetQuestSqrt](https://github.com/SunsetQuest/NewtonPlus-Fast-BigInteger-and-BigFloat-Square-Root/blob/499778b3b53dcf8ecd0f3bb8dc901916c55375a4/BigIntegerSquareRoot.cs#L18) | Optimized for very large integers (>32,000 bits) | Utilizes inverse square root pre-calculation |
 | [NewtonPlusSqrt](https://github.com/SunsetQuest/NewtonPlus-Fast-BigInteger-and-BigFloat-Square-Root/blob/499778b3b53dcf8ecd0f3bb8dc901916c55375a4/BigIntegerSquareRoot.cs#L235C30-L235C44) | Recommended for integers <32,000 bits | Maintains optimal performance for standard use cases |
 
-## Performance Improvements
+### Performance Improvements
 
 The new implementation delivers significant speed improvements for large numbers:
 
@@ -17,7 +19,7 @@ The new implementation delivers significant speed improvements for large numbers
 *   **2x faster** for 128K-bit integers (approximately 1e38500)
 *   **6x faster** for 2M-bit integers (approximately 1e616000)
 
-## Implementation Approach
+### Implementation Approach
 
 This optimization stems from a valuable community contribution by "Member 14929321" (March 21, 2022), who proposed computing the inverse square root to avoid division operations:
 
@@ -33,10 +35,10 @@ This optimization stems from a valuable community contribution by "Member 149293
 
 This article was originally posted on [CodeProject](https://www.codeproject.com/Articles/5321399/NewtonPlus-A-Fast-Big-Number-Square-Root-Function/)
 
+NewtonPlus - A Fast Big Number Square Root Function
+===================================================
 
-
-Contents
---------
+#Contents
 
 - [Introduction](#introduction)
 - [C-Sharp Version](#c-sharp-version)
